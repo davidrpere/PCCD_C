@@ -1,6 +1,0 @@
-/*
- *
- * Proceso lector
- *
- */
-
