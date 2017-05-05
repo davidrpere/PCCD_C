@@ -17,7 +17,7 @@ void signal(sem_t *semaforo);
 void *pago_anulacion(void*);
 
 int main(int argc, char *argv[]){
-    if(argc != 4){
+    if(argc != 3){
         printf("Modo de uso: escritores id_nodo numero_nodos");
         exit(0);
     }
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
         int i=0;
         pthread_t hilo;
         for(; i<numero; i++){
-            if (pthread_create(&hilo, NULL, (void *) pago_anulacion, (void *) NULL) {
+            if (pthread_create(&hilo, NULL, (void *) pago_anulacion, (void *) NULL)) {
                 perror("Error creando un pago o anulacion");
                 exit(-1);
             }
@@ -52,7 +52,7 @@ void *pago_anulacion(void *parametro){
     numero_pagos_anulaciones++;
     signal(&semaforo_contador);
 
-    wait(&semaforo_pagos_anulaciones);
+    wait(&semaforo_pagos_anulaciones); 
     //SC
     sleep(10);
     //local
