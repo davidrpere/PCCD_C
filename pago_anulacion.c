@@ -47,6 +47,7 @@ int main(int argc, char *argv[]){
 
     if(argc != 3){
         printf("Modo de uso: pago_anulacion id_nodo numero_nodos");
+
         exit(0);
     }
 
@@ -65,6 +66,7 @@ int main(int argc, char *argv[]){
 
         pthread_t hilo;
         for(int i = 0; i<numero; i++){
+
             if (pthread_create(&hilo, NULL, (void *) pago_anulacion, (void *) NULL)) {
                 perror("Error creando un pago o anulacion");
                 exit(-1);
@@ -146,6 +148,7 @@ void *pago_anulacion(void *parametro){
     signal(&semaforo_contador);
 
     wait(dir_semaforo_pagos_anulaciones);
+
     //SC
     //Inicio SC distribuida.
     sleep(10);
