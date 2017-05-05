@@ -14,9 +14,8 @@ void wait(sem_t *semaforo);
 void signal(sem_t *semaforo);
 void *prerreserva(void*);
 
-// Direcciones de los semáforos, por orden: lectores(0), prerreservas(1), pagos anulaciones (2)
+// Direcciones de los semáforos, por orden: seccion critica(0), prerreservas(1), pagos anulaciones (2)
 int* dir_semaforos[3];
-
 
 int main(int argc, char *argv[]){
 
@@ -28,14 +27,12 @@ int main(int argc, char *argv[]){
     int num_nodos = atoi[argv[2]];
 
     //Key para memoria compartida para el semáforo de lectores, de prerreservas y de pagos_anulaciones
-    key_t key_semaforo_lectores = 88888881;
-    key_t key_semaforo_prerreservas = 88888882;
-    key_t key_semaforo_pago_anulacion = 88888883;
+    key_t key_semaforos[3] = {88888881, 88888882, 88888883};
 
     int shmid;
 
     for(int i = 0 ; i < 3 ; i++){
-        if ((shmid = shmget(key_semaforo_pago_anulacion, sizeof(sem_t), IPC_CREAT)) == -1) {
+        if ((shmid = shmget(key_semaforos[i], sizeof(sem_t), IPC_CREAT)) == -1) {
             perror("Hubo un error al ejecutar shmget para el semáforo");
             exit(1);
         } else {
@@ -67,7 +64,7 @@ int main(int argc, char *argv[]){
 
 void *prerreserva(void *parametro){
     int valor_sem_pa;
-    sem_wait(dir_semaforos[0]);
+
     sem_wait(dir_semaforos[1]);
 
     if(sem_getvalue(dir_semaforos[3], &valor_sem_pa)==0){
