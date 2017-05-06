@@ -7,7 +7,21 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
-#include
+#include <sys/msg.h>
+
+#define PAGO_ANULACION 3
+#define PRERRESERVA 2
+#define LECTOR 1
+#define REQUEST 0
+#define REPLY 1
+#define maximo(x,y) ((x) > (y)) ? (x) : (y)
+
+struct mensaje{
+    long mtype;
+    int emisor;
+    int ticket;
+    int prioridad;
+} Mensaje;
 
 void wait(sem_t *semaforo);
 void post(sem_t *semaforo);

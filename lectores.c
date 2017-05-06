@@ -1,4 +1,3 @@
-#include <signal.h>
 #include "pccd.c"
 
 #define PRIORIDAD 1
@@ -13,16 +12,14 @@ sem_t semaforo_contador;
 int nodo;
 int num_nodos;
 int numero_lectores;
-int pid = 0;
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
-        printf("Modo de uso: ./lectores 'id_nodo' 'numero_nodos' 'pid_registro'\n");
+        printf("Modo de uso: ./lectores 'id_nodo' 'numero_nodos'\n");
         exit(0);
     }
     nodo = atoi(argv[1]);
     num_nodos = atoi(argv[2]);
-    pid = atoi(argv[3]);
 
     inicializar_semaforo(&semaforo_contador, 1);
     numero_lectores= 0;
@@ -76,9 +73,7 @@ void *lector(void* arg){
     post(&semaforo_contador);
 
     seccion_critica("Grada o evento ha entrado en la SC");
-
     sistema_distribuido();
-
     sleep(10);
     seccion_critica("Grada o evento ha salido de la SC");
 

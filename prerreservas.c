@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <signal.h>
 #include "pccd.c"
 
 #define PRIORIDAD 2
@@ -19,16 +18,14 @@ int nodo;
 int num_nodos;
 int numero_prerreservas;
 int* numero_escritores;
-int pid = 0;
 
 int main(int argc, char *argv[]){
     if(argc != 3){
-        printf("Modo de uso: ./prerreservas 'id_nodo' 'numero_nodos' 'pid_registro'\n");
+        printf("Modo de uso: ./prerreservas 'id_nodo' 'numero_nodos'\n");
         exit(0);
     }
     nodo = atoi(argv[1]);
     num_nodos = atoi(argv[2]);
-    pid = atoi(argv[3]);
 
     inicializar_semaforo(&semaforo_contador, 1);
     numero_prerreservas= 0;
@@ -87,9 +84,7 @@ void *prerreserva(void *parametro){
     wait(semaforo_prioridades);
 
     seccion_critica("Prerreserva ha entrado en la SC");
-
     sistema_distribuido();
-
     sleep(1);
     seccion_critica("Prerreserva ha salido de la SC");
 

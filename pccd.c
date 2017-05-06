@@ -88,3 +88,11 @@ void hora_actual(FILE *fichero){
     strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", hora);
     fprintf(fichero, "%s\n", buf);
 }
+
+void enviar_mensaje(int tipo, int destino, int emisor, int ticket, int prioridad){
+    //TODO
+}
+
+void recibir_mensaje(int tipo, int* origen, int* ticket_origen, int* prioridad_vecino){
+    //TODO
+}
