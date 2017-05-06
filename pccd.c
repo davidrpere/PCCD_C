@@ -71,8 +71,20 @@ void *asignar_memoria_compartida(int zona_memoria){
 
 void seccion_critica(char *mensaje){
     FILE *fichero = fopen("seccion_critica.txt", "a");
+    hora_actual(fichero);
     if(fprintf(fichero, "%s\n", mensaje) < 0 || fclose(fichero) != 0){
         perror("Error al escribir en la seccion critica");
         exit(-1);
     }
+}
+
+void hora_actual(FILE *fichero){
+    time_t     ahora;
+    struct tm *hora;
+    char       buf[80];
+
+    ahora = time(0);
+    hora = localtime(&ahora);
+    strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", hora);
+    fprintf(fichero, "%s\n", buf);
 }
