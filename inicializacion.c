@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
     clave_prioridades = generar_clave("inicializacion.c", nodo);
     clave_lectores = generar_clave("lectores.c", nodo);
     clave_escritores_contador = generar_clave("pccd.c", nodo);
-    clave_escritores_semaforo = generar_clave("pccd.c", -1*nodo);
+    clave_escritores_semaforo = generar_clave("receptor.c", nodo);
 
 
     mem_comp_pagos_anulaciones = obtener_memoria_compartida(clave_pagos_anulaciones, sizeof(sem_t), IPC_CREAT);
