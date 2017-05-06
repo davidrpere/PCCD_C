@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <signal.h>
 #include "pccd.c"
 
 #define PRIORIDAD 3
@@ -18,15 +19,17 @@ int nodo;
 int num_nodos;
 int numero_pagos_anulaciones;
 int *numero_escritores;
+int pid = 0;
 
 
 int main(int argc, char *argv[]){
     if(argc != 3){
-        printf("Modo de uso: ./pagos_anulaciones 'id_nodo' 'numero_nodos'\n");
+        printf("Modo de uso: ./pagos_anulaciones 'id_nodo' 'numero_nodos' 'pid_registro'\n");
         exit(0);
     }
     nodo = atoi(argv[1]);
     num_nodos = atoi(argv[2]);
+    pid = atoi(argv[3]);
 
     inicializar_semaforo(&semaforo_contador, 1);
     numero_pagos_anulaciones = 0;
@@ -92,6 +95,7 @@ void *pago_anulacion(void *parametro){
     wait(semaforo_pagos_anulaciones);
 
     seccion_critica("Pago o anulacion ha entrado en la SC");
+    kill(pid, SIGUSR1);
     sleep(1);
 
     wait(&semaforo_contador);
