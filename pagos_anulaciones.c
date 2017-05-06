@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
     clave_prioridades = generar_clave("inicializacion.c", nodo);
     clave_lectores = generar_clave("lectores.c", nodo);
     clave_escritores_contador = generar_clave("pccd.c", nodo);
-    clave_escritores_semaforo = generar_clave("pccd.c", -1*nodo);
+    clave_escritores_semaforo = generar_clave("receptor.c", nodo);
 
     mem_comp_pagos_anulaciones = obtener_memoria_compartida(clave_pagos_anulaciones, sizeof(sem_t), IPC_EXCL);
     mem_comp_prerreservas = obtener_memoria_compartida(clave_prerreservas, sizeof(sem_t), IPC_EXCL);
@@ -81,41 +81,42 @@ void *pago_anulacion(void *parametro){
         wait(semaforo_lectores);
     }
     *numero_escritores = *numero_escritores +1;
-    signal(semaforo_escritores);
+    post(semaforo_escritores);
 
     wait(&semaforo_contador);
     if(numero_pagos_anulaciones == 0){
         wait(semaforo_prioridades);
-        //wait(semaforo_prerreservas);
-        //wait(semaforo_lectores);
     }
     numero_pagos_anulaciones++;
-    signal(&semaforo_contador);
+    post(&semaforo_contador);
 
     wait(semaforo_pagos_anulaciones);
 
     seccion_critica("Pago o anulacion ha entrado en la SC");
-    kill(pid, SIGUSR1);
+
+    sistema_distribuido();
     sleep(1);
 
     wait(&semaforo_contador);
     numero_pagos_anulaciones--;
     if(numero_pagos_anulaciones == 0){
-        signal(semaforo_prioridades);
-        //signal(semaforo_prerreservas);
-        //signal(semaforo_lectores);
+        post(semaforo_prioridades);
     }
-    signal(&semaforo_contador);
+    post(&semaforo_contador);
 
     wait(semaforo_escritores);
     *numero_escritores = *numero_escritores -1;
     if(*numero_escritores == 0){
-        signal(semaforo_lectores);
+        post(semaforo_lectores);
     }
-    signal(semaforo_escritores);
+    post(semaforo_escritores);
 
     seccion_critica("Pago o anulacion ha salido de la SC");
-    signal(semaforo_pagos_anulaciones);
+    post(semaforo_pagos_anulaciones);
 
     pthread_exit((void*)NULL);
+}
+
+void sistema_distribuido(){
+
 }

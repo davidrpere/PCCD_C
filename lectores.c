@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
 void *lector(void* arg){
 
     wait(semaforo_lectores);
-    signal(semaforo_lectores);
+    post(semaforo_lectores);
 
     wait(&semaforo_contador);
     if(numero_lectores == 0){
@@ -73,21 +73,27 @@ void *lector(void* arg){
         //wait(semaforo_lectores);
     }
     numero_lectores++;
-    signal(&semaforo_contador);
+    post(&semaforo_contador);
 
     seccion_critica("Grada o evento ha entrado en la SC");
-    kill(pid, SIGALRM);
+
+    sistema_distribuido();
+
     sleep(10);
     seccion_critica("Grada o evento ha salido de la SC");
 
     wait(&semaforo_contador);
     numero_lectores--;
     if(numero_lectores == 0){
-        //signal(semaforo_lectores);
-        signal(semaforo_prerreservas);
-        signal(semaforo_pagos_anulaciones);
+        //post(semaforo_lectores);
+        post(semaforo_prerreservas);
+        post(semaforo_pagos_anulaciones);
     }
-    signal(&semaforo_contador);
+    post(&semaforo_contador);
 
     pthread_exit((void*)NULL);
+}
+
+void sistema_distribuido(){
+
 }

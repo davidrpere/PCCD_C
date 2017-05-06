@@ -7,9 +7,9 @@ void wait(sem_t *semaforo){
     }
 }
 
-void signal(sem_t *semaforo){
+void post(sem_t *semaforo){
     if(sem_post(semaforo) != 0){
-        perror("Error al hacer un signal");
+        perror("Error al hacer un post");
         exit(-1);
     }
 }

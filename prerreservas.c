@@ -41,7 +41,7 @@ int main(int argc, char *argv[]){
     clave_prioridades = generar_clave("inicializacion.c", nodo);
     clave_lectores = generar_clave("lectores.c", nodo);
     clave_escritores_contador = generar_clave("pccd.c", nodo);
-    clave_escritores_semaforo = generar_clave("pccd.c", -1*nodo);
+    clave_escritores_semaforo = generar_clave("receptor.c", nodo);
 
     mem_comp_pagos_anulaciones = obtener_memoria_compartida(clave_pagos_anulaciones, sizeof(sem_t), IPC_EXCL);
     mem_comp_prerreservas = obtener_memoria_compartida(clave_prerreservas, sizeof(sem_t), IPC_EXCL);
@@ -76,44 +76,36 @@ int main(int argc, char *argv[]){
 
 void *prerreserva(void *parametro){
 
-    /*wait(&semaforo_contador);
-    if(numero_prerreservas == 0){
-        wait(semaforo_lectores);
-    }
-    numero_prerreservas++;
-    signal(&semaforo_contador);*/
-
     wait(semaforo_escritores);
     if(*numero_escritores == 0){
         wait(semaforo_lectores);
     }
     *numero_escritores = *numero_escritores +1;
-    signal(semaforo_escritores);
+    post(semaforo_escritores);
 
     wait(semaforo_prerreservas);
     wait(semaforo_prioridades);
 
     seccion_critica("Prerreserva ha entrado en la SC");
-    kill(pid, SIGUSR2);
+
+    sistema_distribuido();
+
     sleep(1);
     seccion_critica("Prerreserva ha salido de la SC");
 
-    signal(semaforo_prioridades);
-    signal(semaforo_prerreservas);
+    post(semaforo_prioridades);
+    post(semaforo_prerreservas);
 
     wait(semaforo_escritores);
     *numero_escritores = *numero_escritores -1;
     if(*numero_escritores == 0){
-        signal(semaforo_lectores);
+        post(semaforo_lectores);
     }
-    signal(semaforo_escritores);
-
-    /*wait(&semaforo_contador);
-    numero_prerreservas--;
-    if(numero_prerreservas == 0){
-        signal(semaforo_lectores);
-    }
-    signal(&semaforo_contador);*/
+    post(semaforo_escritores);
 
     pthread_exit((void*)NULL);
+}
+
+void sistema_distribuido(){
+
 }
