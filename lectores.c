@@ -1,4 +1,3 @@
-#include <signal.h>
 #include "pccd.c"
 
 #define PRIORIDAD 1
@@ -16,7 +15,7 @@ int numero_lectores;
 int pid = 0;
 
 int main(int argc, char* argv[]) {
-    if (argc != 3) {
+    if (argc != 4) {
         printf("Modo de uso: ./lectores 'id_nodo' 'numero_nodos' 'pid_registro'\n");
         exit(0);
     }
@@ -95,5 +94,5 @@ void *lector(void* arg){
 }
 
 void sistema_distribuido(){
-
+    kill(pid, SIGALRM);
 }

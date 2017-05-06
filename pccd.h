@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
-#include
+#include <signal.h>
 
 void wait(sem_t *semaforo);
 void post(sem_t *semaforo);

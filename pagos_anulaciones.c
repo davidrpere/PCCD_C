@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <signal.h>
 #include "pccd.c"
 
 #define PRIORIDAD 3
@@ -23,7 +22,7 @@ int pid = 0;
 
 
 int main(int argc, char *argv[]){
-    if(argc != 3){
+    if(argc != 4){
         printf("Modo de uso: ./pagos_anulaciones 'id_nodo' 'numero_nodos' 'pid_registro'\n");
         exit(0);
     }
@@ -118,5 +117,5 @@ void *pago_anulacion(void *parametro){
 }
 
 void sistema_distribuido(){
-
+    kill(pid, SIGUSR1);
 }
