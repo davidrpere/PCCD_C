@@ -16,7 +16,7 @@
 #define REPLY 1
 #define maximo(x,y) ((x) > (y)) ? (x) : (y)
 
-struct mensaje{
+typedef struct mensaje{
     long mtype;
     int emisor;
     int ticket;
@@ -31,3 +31,6 @@ key_t generar_clave(const char *fichero, int semilla);
 int obtener_memoria_compartida(key_t clave, size_t talla, int modo);
 void *asignar_memoria_compartida(int zona_memoria);
 void hora_actual(FILE *fichero);
+void enviar_mensaje(int tipo, int destino, int emisor, int ticket, int prioridad);
+void recibir_mensaje(int tipo, int receptor, int* emisor, int* ticket_origen, int* prioridad_vecino);
+int obtener_buzon(key_t clave, int modo);

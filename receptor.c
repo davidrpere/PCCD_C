@@ -5,9 +5,10 @@ int main(int argc, char* argv[]) {
     if (argc != 3) {
         printf("Modo de uso: ./receptor 'id_nodo' 'numero_nodos'\n");
         exit(0);
-    }
+    }//numero_nodos debe ser al menos 2, si no estariamos reservando memoria para un array de longuitud 0
     int nodo = atoi(argv[1]);
     int num_nodos = atoi(argv[2]);
+
 
     int *mi_ticket, *max_ticket, *id_nodos_pendientes, *num_pendientes, *quiero, *mi_prioridad;
     key_t clave_mi_ticket, clave_max_ticket, clave_id_nodos_pendientes, clave_num_pendientes, clave_quiero, clave_mi_prioridad;
@@ -22,7 +23,7 @@ int main(int argc, char* argv[]) {
 
     mem_comp_mi_ticket = obtener_memoria_compartida(clave_mi_ticket, sizeof(int), IPC_CREAT);
     mem_comp_max_ticket = obtener_memoria_compartida(clave_max_ticket, sizeof(int), IPC_CREAT);
-    mem_comp_id_nodos_pendientes = obtener_memoria_compartida(clave_id_nodos_pendientes, sizeof(int) * (num_nodos - 1), IPC_CREAT);
+    mem_comp_id_nodos_pendientes = obtener_memoria_compartida(clave_id_nodos_pendientes, (num_nodos - 1)*sizeof(int), IPC_CREAT);
     mem_comp_num_pendientes = obtener_memoria_compartida(clave_num_pendientes, sizeof(int), IPC_CREAT);
     mem_comp_quiero = obtener_memoria_compartida(clave_quiero, sizeof(int), IPC_CREAT);
     mem_comp_mi_prioridad = obtener_memoria_compartida(clave_mi_prioridad, sizeof(int), IPC_CREAT);
@@ -34,22 +35,23 @@ int main(int argc, char* argv[]) {
     quiero = asignar_memoria_compartida(mem_comp_quiero);
     mi_prioridad = asignar_memoria_compartida(mem_comp_mi_prioridad);
 
+    key_t clave_buzon = generar_clave("pccd.c", nodo);
+    obtener_buzon(clave_buzon, IPC_CREAT);
+
 
     int vecino = 0, ticket_vecino = 0, prioridad_vecino = 0;
 
     while (1) {
-        recibir_mensaje(REQUEST, &vecino, &ticket_vecino, &prioridad_vecino);
+        recibir_mensaje(REQUEST, nodo, &vecino, &ticket_vecino, &prioridad_vecino);
         *max_ticket = maximo(ticket_vecino, *max_ticket);
-
         if(*quiero != 1 || *mi_prioridad < prioridad_vecino ||
                 (*mi_prioridad == prioridad_vecino && *mi_ticket > ticket_vecino) ||
                 (*mi_prioridad == prioridad_vecino && *mi_ticket == ticket_vecino && nodo > vecino) ||
                 (*mi_prioridad == LECTOR && prioridad_vecino == LECTOR)){
-            enviar_mensaje(REPLY, vecino, nodo, 0, mi_prioridad);
+            enviar_mensaje(REPLY, vecino, nodo, 0, *mi_prioridad);
         }else{
             id_nodos_pendientes[*num_pendientes] = vecino;
             *num_pendientes = *num_pendientes +1;
         }
-
     }
 }

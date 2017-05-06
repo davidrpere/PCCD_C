@@ -4,8 +4,6 @@
 #include <pthread.h>
 #include "pccd.c"
 
-#define PRIORIDAD 3
-
 void *pago_anulacion(void*);
 
 sem_t semaforo_contador;
@@ -18,7 +16,6 @@ int nodo;
 int num_nodos;
 int numero_pagos_anulaciones;
 int *numero_escritores;
-
 
 int main(int argc, char *argv[]){
     if(argc != 3){
@@ -89,8 +86,8 @@ void *pago_anulacion(void *parametro){
 
     wait(semaforo_pagos_anulaciones);
 
-    seccion_critica("Pago o anulacion ha entrado en la SC");
-    sistema_distribuido();
+    seccion_critica_local("Pago o anulacion ha entrado en la SC");
+    seccion_critica_distribuida(nodo, num_nodos, PAGO_ANULACION);
     sleep(1);
 
     wait(&semaforo_contador);
@@ -107,12 +104,8 @@ void *pago_anulacion(void *parametro){
     }
     post(semaforo_escritores);
 
-    seccion_critica("Pago o anulacion ha salido de la SC");
+    seccion_critica_local("Pago o anulacion ha salido de la SC");
     post(semaforo_pagos_anulaciones);
 
-    pthread_exit((void*)NULL);
-}
-
-void sistema_distribuido(){
-
+    pthread_exit(NULL);
 }

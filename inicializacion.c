@@ -26,10 +26,15 @@ int main(int argc, char *argv[]){
 
 
     mem_comp_pagos_anulaciones = obtener_memoria_compartida(clave_pagos_anulaciones, sizeof(sem_t), IPC_CREAT);
+    printf("A\n");
     mem_comp_prerreservas = obtener_memoria_compartida(clave_prerreservas, sizeof(sem_t), IPC_CREAT);
+    printf("A\n");
     mem_comp_prioridades = obtener_memoria_compartida(clave_prioridades, sizeof(sem_t), IPC_CREAT);
+    printf("A\n");
     mem_comp_lectores = obtener_memoria_compartida(clave_lectores, sizeof(sem_t), IPC_CREAT);
+    printf("A\n");
     mem_comp_escritores_contador = obtener_memoria_compartida(clave_escritores_contador, sizeof(int), IPC_CREAT);
+    printf("A\n");
     mem_comp_escritores_semaforo = obtener_memoria_compartida(clave_escritores_semaforo, sizeof(sem_t), IPC_CREAT);
 
 
@@ -49,7 +54,7 @@ int main(int argc, char *argv[]){
 
     printf("Memoria compartida inicializada correctamente\n");
 
-    if(remove("seccion_critica.txt") != 0){
+    if(remove("seccion_critica_local.txt") != 0){
         perror("Error al eliminar la SC");
         exit(-1);
     }

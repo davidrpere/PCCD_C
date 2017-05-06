@@ -1,7 +1,5 @@
 #include "pccd.c"
 
-#define PRIORIDAD 1
-
 void *lector(void*);
 
 sem_t* semaforo_pagos_anulaciones;
@@ -58,7 +56,7 @@ int main(int argc, char* argv[]) {
 
 }
 
-void *lector(void* arg){
+void *lector(void* parametro){
 
     wait(semaforo_lectores);
     post(semaforo_lectores);
@@ -67,28 +65,22 @@ void *lector(void* arg){
     if(numero_lectores == 0){
         wait(semaforo_pagos_anulaciones);
         wait(semaforo_prerreservas);
-        //wait(semaforo_lectores);
     }
     numero_lectores++;
     post(&semaforo_contador);
 
-    seccion_critica("Grada o evento ha entrado en la SC");
-    sistema_distribuido();
+    seccion_critica_local("Grada o evento ha entrado en la SC");
+    //seccion_critica_distribuida();
     sleep(10);
-    seccion_critica("Grada o evento ha salido de la SC");
+    seccion_critica_local("Grada o evento ha salido de la SC");
 
     wait(&semaforo_contador);
     numero_lectores--;
     if(numero_lectores == 0){
-        //post(semaforo_lectores);
         post(semaforo_prerreservas);
         post(semaforo_pagos_anulaciones);
     }
     post(&semaforo_contador);
 
-    pthread_exit((void*)NULL);
-}
-
-void sistema_distribuido(){
-
+    pthread_exit(NULL);
 }

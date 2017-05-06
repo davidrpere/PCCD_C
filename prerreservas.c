@@ -4,8 +4,6 @@
 #include <pthread.h>
 #include "pccd.c"
 
-#define PRIORIDAD 2
-
 void *prerreserva(void*);
 
 sem_t* semaforo_pagos_anulaciones;
@@ -16,7 +14,6 @@ sem_t semaforo_contador;
 sem_t* semaforo_escritores;
 int nodo;
 int num_nodos;
-int numero_prerreservas;
 int* numero_escritores;
 
 int main(int argc, char *argv[]){
@@ -28,7 +25,6 @@ int main(int argc, char *argv[]){
     num_nodos = atoi(argv[2]);
 
     inicializar_semaforo(&semaforo_contador, 1);
-    numero_prerreservas= 0;
 
     key_t clave_pagos_anulaciones, clave_prerreservas, clave_prioridades, clave_lectores, clave_escritores_semaforo, clave_escritores_contador;
     int mem_comp_pagos_anulaciones, mem_comp_prerreservas, mem_comp_prioridades, mem_comp_lectores, mem_comp_escritores_semaforo, mem_comp_escritores_contador;
@@ -83,10 +79,10 @@ void *prerreserva(void *parametro){
     wait(semaforo_prerreservas);
     wait(semaforo_prioridades);
 
-    seccion_critica("Prerreserva ha entrado en la SC");
-    sistema_distribuido();
+    seccion_critica_local("Prerreserva ha entrado en la SC");
+    seccion_critica_distribuida(nodo, num_nodos, PRERRESERVA);
     sleep(1);
-    seccion_critica("Prerreserva ha salido de la SC");
+    seccion_critica_local("Prerreserva ha salido de la SC");
 
     post(semaforo_prioridades);
     post(semaforo_prerreservas);
@@ -98,9 +94,5 @@ void *prerreserva(void *parametro){
     }
     post(semaforo_escritores);
 
-    pthread_exit((void*)NULL);
-}
-
-void sistema_distribuido(){
-
+    pthread_exit(NULL);
 }
