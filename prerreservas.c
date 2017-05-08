@@ -5,13 +5,15 @@
 #include "pccd.c"
 
 void *prerreserva(void*);
+void sistema_distribuido(void);
 
 sem_t* semaforo_pagos_anulaciones;
 sem_t* semaforo_prerreservas;
 sem_t* semaforo_prioridades;
 sem_t* semaforo_lectores;
-sem_t semaforo_contador;
+sem_t semaforo_contador_local;
 sem_t* semaforo_escritores;
+sem_t* semaforo_atomico;
 int nodo;
 int num_nodos;
 int* numero_escritores;
@@ -24,7 +26,7 @@ int main(int argc, char *argv[]){
     nodo = atoi(argv[1]);
     num_nodos = atoi(argv[2]);
 
-    inicializar_semaforo(&semaforo_contador, 1);
+    inicializar_semaforo(&semaforo_contador_local, 1);
 
     key_t clave_pagos_anulaciones, clave_prerreservas, clave_prioridades, clave_lectores, clave_escritores_semaforo, clave_escritores_contador;
     int mem_comp_pagos_anulaciones, mem_comp_prerreservas, mem_comp_prioridades, mem_comp_lectores, mem_comp_escritores_semaforo, mem_comp_escritores_contador;
@@ -49,6 +51,10 @@ int main(int argc, char *argv[]){
     semaforo_lectores = asignar_memoria_compartida(mem_comp_lectores);
     numero_escritores = asignar_memoria_compartida(mem_comp_escritores_contador);
     semaforo_escritores = asignar_memoria_compartida(mem_comp_escritores_semaforo);
+
+    key_t clave_atomico = generar_clave("inicializacion.c", -1*nodo);
+    int mem_comp_atomico = obtener_memoria_compartida(clave_atomico, sizeof(sem_t), IPC_EXCL);
+    semaforo_atomico = asignar_memoria_compartida(mem_comp_atomico);
 
     while(1){
         printf("¿Cuantos procesos de prerreserva quieres lanzar? (Pulse 0 para salir) ");
@@ -80,7 +86,7 @@ void *prerreserva(void *parametro){
     wait(semaforo_prioridades);
 
     seccion_critica_local("Prerreserva ha entrado en la SC");
-    seccion_critica_distribuida(nodo, num_nodos, PRERRESERVA);
+    sistema_distribuido();
     sleep(1);
     seccion_critica_local("Prerreserva ha salido de la SC");
 
@@ -95,4 +101,62 @@ void *prerreserva(void *parametro){
     post(semaforo_escritores);
 
     pthread_exit(NULL);
+}
+
+void sistema_distribuido(){
+
+    int *quiero, *mi_ticket, *max_ticket, *num_pendientes, *id_nodos_pendientes, *mi_prioridad;
+
+    key_t clave_mi_ticket, clave_max_ticket, clave_id_nodos_pendientes, clave_num_pendientes, clave_quiero, clave_mi_prioridad;
+    int mem_comp_mi_ticket, mem_comp_max_ticket, mem_comp_id_nodos_pendientes, mem_comp_num_pendientes, mem_comp_quiero, mem_comp_mi_prioridad;
+
+    clave_mi_ticket = generar_clave("receptor.c", -1 * nodo);
+    clave_max_ticket = generar_clave("lectores.c", -1 * nodo);
+    clave_id_nodos_pendientes = generar_clave("pagos_anulaciones.c", -1 * nodo);
+    clave_num_pendientes = generar_clave("prerreservas.c", -1 * nodo);
+    clave_quiero = generar_clave("pccd.c", -1 * nodo);
+    clave_mi_prioridad = generar_clave("pccd.h", -1 * nodo);
+
+    mem_comp_mi_ticket = obtener_memoria_compartida(clave_mi_ticket, sizeof(int), IPC_EXCL);
+    mem_comp_max_ticket = obtener_memoria_compartida(clave_max_ticket, sizeof(int), IPC_EXCL);
+    mem_comp_id_nodos_pendientes = obtener_memoria_compartida(clave_id_nodos_pendientes, (num_nodos - 1)*sizeof(int), IPC_EXCL);
+    mem_comp_num_pendientes = obtener_memoria_compartida(clave_num_pendientes, sizeof(int), IPC_EXCL);
+    mem_comp_quiero = obtener_memoria_compartida(clave_quiero, sizeof(int), IPC_EXCL);
+    mem_comp_mi_prioridad = obtener_memoria_compartida(clave_mi_prioridad, sizeof(int), IPC_EXCL);
+
+    mi_ticket = asignar_memoria_compartida(mem_comp_mi_ticket);
+    max_ticket = asignar_memoria_compartida(mem_comp_max_ticket);
+    id_nodos_pendientes = asignar_memoria_compartida(mem_comp_id_nodos_pendientes);
+    num_pendientes = asignar_memoria_compartida(mem_comp_num_pendientes);
+    quiero = asignar_memoria_compartida(mem_comp_quiero);
+    mi_prioridad = asignar_memoria_compartida(mem_comp_mi_prioridad);
+
+    wait(semaforo_atomico);
+    *quiero = 1;
+    *mi_ticket = *max_ticket +1;
+    *mi_prioridad = PRERRESERVA;
+    post(semaforo_atomico);
+
+    int emisor, ticket_origen, prioridad_origen;
+
+    int i;
+    for(i=0; i<num_nodos; i++){
+        if(i != nodo){
+            enviar_mensaje(REQUEST, i, nodo, *mi_ticket, *mi_prioridad);
+        }
+    }
+    for(i=0; i<num_nodos-1; i++){
+        recibir_mensaje(REPLY, nodo, &emisor, &ticket_origen, &prioridad_origen);
+    }
+    //SC
+    sleep(1);
+    //distribuida
+
+    wait(semaforo_atomico);
+    *quiero = 0;
+    for(i=0; i<*num_pendientes; i++){
+        enviar_mensaje(REPLY, id_nodos_pendientes[i], nodo, *mi_ticket, *mi_prioridad);
+    }
+    *num_pendientes=0;
+    post(semaforo_atomico);
 }

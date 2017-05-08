@@ -38,12 +38,22 @@ int main(int argc, char* argv[]) {
     key_t clave_buzon = generar_clave("pccd.c", nodo);
     obtener_buzon(clave_buzon, IPC_CREAT);
 
+    /***************************************************************************************/
+
+    /*************************************************************************************/
+
+    key_t clave_atomico = generar_clave("inicializacion.c", -1*nodo);
+    int mem_comp_atomico = obtener_memoria_compartida(clave_atomico, sizeof(sem_t), IPC_CREAT);
+    sem_t *semaforo_atomico = asignar_memoria_compartida(mem_comp_atomico);
+    inicializar_semaforo(semaforo_atomico, 1);
 
     int vecino = 0, ticket_vecino = 0, prioridad_vecino = 0;
 
     while (1) {
         recibir_mensaje(REQUEST, nodo, &vecino, &ticket_vecino, &prioridad_vecino);
+        wait(semaforo_atomico);
         *max_ticket = maximo(ticket_vecino, *max_ticket);
+        //wait(semaforo_atomico);
         if(*quiero != 1 || *mi_prioridad < prioridad_vecino ||
                 (*mi_prioridad == prioridad_vecino && *mi_ticket > ticket_vecino) ||
                 (*mi_prioridad == prioridad_vecino && *mi_ticket == ticket_vecino && nodo > vecino) ||
@@ -53,5 +63,6 @@ int main(int argc, char* argv[]) {
             id_nodos_pendientes[*num_pendientes] = vecino;
             *num_pendientes = *num_pendientes +1;
         }
+        post(semaforo_atomico);
     }
 }

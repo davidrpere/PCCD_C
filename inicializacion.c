@@ -24,17 +24,11 @@ int main(int argc, char *argv[]){
     clave_escritores_contador = generar_clave("pccd.c", nodo);
     clave_escritores_semaforo = generar_clave("receptor.c", nodo);
 
-
     mem_comp_pagos_anulaciones = obtener_memoria_compartida(clave_pagos_anulaciones, sizeof(sem_t), IPC_CREAT);
-    printf("A\n");
     mem_comp_prerreservas = obtener_memoria_compartida(clave_prerreservas, sizeof(sem_t), IPC_CREAT);
-    printf("A\n");
     mem_comp_prioridades = obtener_memoria_compartida(clave_prioridades, sizeof(sem_t), IPC_CREAT);
-    printf("A\n");
     mem_comp_lectores = obtener_memoria_compartida(clave_lectores, sizeof(sem_t), IPC_CREAT);
-    printf("A\n");
     mem_comp_escritores_contador = obtener_memoria_compartida(clave_escritores_contador, sizeof(int), IPC_CREAT);
-    printf("A\n");
     mem_comp_escritores_semaforo = obtener_memoria_compartida(clave_escritores_semaforo, sizeof(sem_t), IPC_CREAT);
 
 
