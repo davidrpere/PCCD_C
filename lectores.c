@@ -81,10 +81,10 @@ void *lector(void* parametro){
     numero_lectores_local++;
     post(&semaforo_contador_local);
 
-    seccion_critica_local("Grada o evento ha entrado en la SC");
+    seccion_critica_local("Grada o evento ha entrado en la SC local", nodo);
     sistema_distribuido();
     sleep(10);
-    seccion_critica_local("Grada o evento ha salido de la SC");
+    seccion_critica_local("Grada o evento ha salido de la SC local", nodo);
 
     wait(&semaforo_contador_local);
     numero_lectores_local--;
@@ -138,12 +138,12 @@ void sistema_distribuido(){
         *mi_ticket = *max_ticket +1;
         *mi_prioridad = LECTOR;
         post(semaforo_atomico);
-        for (i = 0; i < num_nodos; i++) {
+        for (i = 1; i <= num_nodos; i++) {
             if (i != nodo) {
                 enviar_mensaje(REQUEST, i, nodo, *mi_ticket, *mi_prioridad);
             }
         }
-        for (i = 0; i < num_nodos - 1; i++) {
+        for (i = 1; i <= num_nodos - 1; i++) {
             recibir_mensaje(REPLY, nodo, &emisor, &ticket_origen, &prioridad_origen);
         }
     }
@@ -152,7 +152,9 @@ void sistema_distribuido(){
 
     post(&semaforo_permiso);
     //SC
+    seccion_critica_distribuda("Lector ha entrado en la SC distribuida", nodo);
     sleep(1);
+    seccion_critica_distribuda("Lector ha salido de la SC distribuida", nodo);
     //distribuida
 
     wait(&semaforo_contador_distribuido);

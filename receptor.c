@@ -35,6 +35,11 @@ int main(int argc, char* argv[]) {
     quiero = asignar_memoria_compartida(mem_comp_quiero);
     mi_prioridad = asignar_memoria_compartida(mem_comp_mi_prioridad);
 
+    *quiero = 0;
+    *mi_prioridad = 100;
+    *num_pendientes = 0;
+    *mi_ticket = 0;
+
     key_t clave_buzon = generar_clave("pccd.c", nodo);
     obtener_buzon(clave_buzon, IPC_CREAT);
 
@@ -51,6 +56,7 @@ int main(int argc, char* argv[]) {
 
     while (1) {
         recibir_mensaje(REQUEST, nodo, &vecino, &ticket_vecino, &prioridad_vecino);
+        printf("He recidido un mensaje del nodo %i con prioridad %i\n", vecino, prioridad_vecino);
         wait(semaforo_atomico);
         *max_ticket = maximo(ticket_vecino, *max_ticket);
         //wait(semaforo_atomico);

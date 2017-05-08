@@ -85,10 +85,10 @@ void *prerreserva(void *parametro){
     wait(semaforo_prerreservas);
     wait(semaforo_prioridades);
 
-    seccion_critica_local("Prerreserva ha entrado en la SC");
+    seccion_critica_local("Prerreserva ha entrado en la SC local", nodo);
     sistema_distribuido();
     sleep(1);
-    seccion_critica_local("Prerreserva ha salido de la SC");
+    seccion_critica_local("Prerreserva ha salido de la SC local", nodo);
 
     post(semaforo_prioridades);
     post(semaforo_prerreservas);
@@ -140,16 +140,18 @@ void sistema_distribuido(){
     int emisor, ticket_origen, prioridad_origen;
 
     int i;
-    for(i=0; i<num_nodos; i++){
+    for(i=1; i<=num_nodos; i++){
         if(i != nodo){
             enviar_mensaje(REQUEST, i, nodo, *mi_ticket, *mi_prioridad);
         }
     }
-    for(i=0; i<num_nodos-1; i++){
+    for(i=1; i<=num_nodos-1; i++){
         recibir_mensaje(REPLY, nodo, &emisor, &ticket_origen, &prioridad_origen);
     }
     //SC
+    seccion_critica_distribuda("Prerreserva ha entrado en la SC distribuida", nodo);
     sleep(1);
+    seccion_critica_distribuda("Prerreserva ha salido de la SC distribuida", nodo);
     //distribuida
 
     wait(semaforo_atomico);

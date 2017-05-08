@@ -92,7 +92,7 @@ void *pago_anulacion(void *parametro){
 
     wait(semaforo_pagos_anulaciones);
 
-    seccion_critica_local("Pago o anulacion ha entrado en la SC");
+    seccion_critica_local("Pago o anulacion ha entrado en la SC", nodo);
     //seccion_critica_distribuida(nodo, num_nodos, PAGO_ANULACION);
     sistema_distribuido();
     sleep(1);
@@ -111,7 +111,7 @@ void *pago_anulacion(void *parametro){
     }
     post(semaforo_escritores);
 
-    seccion_critica_local("Pago o anulacion ha salido de la SC");
+    seccion_critica_local("Pago o anulacion ha salido de la SC", nodo);
     post(semaforo_pagos_anulaciones);
 
     pthread_exit(NULL);
@@ -154,16 +154,18 @@ void sistema_distribuido(){
     int emisor, ticket_origen, prioridad_origen;
 
     int i;
-    for(i=0; i<num_nodos; i++){
+    for(i=1; i<=num_nodos; i++){
         if(i != nodo){
             enviar_mensaje(REQUEST, i, nodo, *mi_ticket, *mi_prioridad);
         }
     }
-    for(i=0; i<num_nodos-1; i++){
+    for(i=1; i<=num_nodos-1; i++){
         recibir_mensaje(REPLY, nodo, &emisor, &ticket_origen, &prioridad_origen);
     }
     //SC
+    seccion_critica_distribuda("Pago o anulacion ha entrado en la SC", nodo);
     sleep(1);
+    seccion_critica_distribuda("Pago o anulacion ha salido de la SC", nodo);
     //distribuida
 
     wait(semaforo_atomico);
