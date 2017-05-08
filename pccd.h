@@ -12,7 +12,7 @@
 #define PAGO_ANULACION 3
 #define PRERRESERVA 2
 #define LECTOR 1
-#define REQUEST 0
+#define REQUEST 2
 #define REPLY 1
 #define maximo(x,y) ((x) > (y)) ? (x) : (y)
 

@@ -33,10 +33,10 @@ int main(int argc, char* argv[]) {
     key_t clave_pagos_anulaciones, clave_prerreservas, clave_prioridades, clave_lectores;
     int mem_comp_pagos_anulaciones, mem_comp_prerreservas, mem_comp_prioridades, mem_comp_lectores;
 
-    clave_pagos_anulaciones = generar_clave("pagos_anulaciones.c", nodo);
-    clave_prerreservas = generar_clave("prerreservas.c", nodo);
-    clave_prioridades = generar_clave("inicializacion.c", nodo);
-    clave_lectores = generar_clave("lectores.c", nodo);
+    clave_pagos_anulaciones = generar_clave("/home/juan/PCCD_C/pagos_anulaciones.c", nodo);
+    clave_prerreservas = generar_clave("/home/juan/PCCD_C/prerreservas.c", nodo);
+    clave_prioridades = generar_clave("/home/juan/PCCD_C/inicializacion.c", nodo);
+    clave_lectores = generar_clave("/home/juan/PCCD_C/lectores.c", nodo);
 
     mem_comp_pagos_anulaciones = obtener_memoria_compartida(clave_pagos_anulaciones, sizeof(sem_t), IPC_EXCL);
     mem_comp_prerreservas = obtener_memoria_compartida(clave_prerreservas, sizeof(sem_t), IPC_EXCL);
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     semaforo_prioridades = asignar_memoria_compartida(mem_comp_prioridades);
     semaforo_lectores = asignar_memoria_compartida(mem_comp_lectores);
 
-    key_t clave_atomico = generar_clave("inicializacion.c", -1*nodo);
+    key_t clave_atomico = generar_clave("/home/juan/PCCD_C/inicializacion.c", -1*nodo);
     int mem_comp_atomico = obtener_memoria_compartida(clave_atomico, sizeof(sem_t), IPC_EXCL);
     semaforo_atomico = asignar_memoria_compartida(mem_comp_atomico);
 
@@ -104,12 +104,12 @@ void sistema_distribuido(){
     key_t clave_mi_ticket, clave_max_ticket, clave_id_nodos_pendientes, clave_num_pendientes, clave_quiero, clave_mi_prioridad;
     int mem_comp_mi_ticket, mem_comp_max_ticket, mem_comp_id_nodos_pendientes, mem_comp_num_pendientes, mem_comp_quiero, mem_comp_mi_prioridad;
 
-    clave_mi_ticket = generar_clave("receptor.c", -1 * nodo);
-    clave_max_ticket = generar_clave("lectores.c", -1 * nodo);
-    clave_id_nodos_pendientes = generar_clave("pagos_anulaciones.c", -1 * nodo);
-    clave_num_pendientes = generar_clave("prerreservas.c", -1 * nodo);
-    clave_quiero = generar_clave("pccd.c", -1 * nodo);
-    clave_mi_prioridad = generar_clave("pccd.h", -1 * nodo);
+    clave_mi_ticket = generar_clave("/home/juan/PCCD_C/receptor.c", -1 * nodo);
+    clave_max_ticket = generar_clave("/home/juan/PCCD_C/lectores.c", -1 * nodo);
+    clave_id_nodos_pendientes = generar_clave("/home/juan/PCCD_C/pagos_anulaciones.c", -1 * nodo);
+    clave_num_pendientes = generar_clave("/home/juan/PCCD_C/prerreservas.c", -1 * nodo);
+    clave_quiero = generar_clave("/home/juan/PCCD_C/pccd.c", -1 * nodo);
+    clave_mi_prioridad = generar_clave("/home/juan/PCCD_C/pccd.h", -1 * nodo);
 
     mem_comp_mi_ticket = obtener_memoria_compartida(clave_mi_ticket, sizeof(int), IPC_EXCL);
     mem_comp_max_ticket = obtener_memoria_compartida(clave_max_ticket, sizeof(int), IPC_EXCL);
@@ -153,7 +153,7 @@ void sistema_distribuido(){
     post(&semaforo_permiso);
     //SC
     seccion_critica_distribuda("Lector ha entrado en la SC distribuida", nodo);
-    sleep(1);
+    sleep(10);
     seccion_critica_distribuda("Lector ha salido de la SC distribuida", nodo);
     //distribuida
 

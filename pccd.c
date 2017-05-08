@@ -42,7 +42,7 @@ int obtener_memoria_compartida(key_t clave, size_t talla, int modo){
 
     if(modo == IPC_CREAT){
         memoria_compartida = shmget(clave, talla, 0777 | IPC_CREAT);
-        FILE *fichero = fopen("memoria_compartida.txt", "a");
+        FILE *fichero = fopen("/home/juan/PCCD_C/memoria_compartida.txt", "a");
         if(fprintf(fichero, "%i\n", memoria_compartida) < 0 || fclose(fichero) != 0){
             perror("Error al escribir en el fichero 'memoria_compartida.txt'");
             exit(-1);
@@ -74,7 +74,7 @@ void *asignar_memoria_compartida(int zona_memoria){
 }
 
 void seccion_critica_local(char *mensaje, int nodo){
-    FILE *fichero = fopen("seccion_critica_local.txt", "a");
+    FILE *fichero = fopen("/home/juan/PCCD_C/seccion_critica_local.txt", "a");
     hora_actual(fichero);
     if(fprintf(fichero, "%i %s\n", nodo, mensaje) < 0 || fclose(fichero) != 0){
         perror("Error al escribir en la seccion critica local");
@@ -83,7 +83,7 @@ void seccion_critica_local(char *mensaje, int nodo){
 }
 
 void seccion_critica_distribuda(char *mensaje, int nodo){
-    FILE *fichero = fopen("seccion_critica_distribuida.txt", "a");
+    FILE *fichero = fopen("/home/juan/PCCD_C/seccion_critica_distribuida.txt", "a");
     hora_actual(fichero);
     if(fprintf(fichero, "%i %s\n", nodo, mensaje) < 0 || fclose(fichero) != 0){
         perror("Error al escribir en la seccion critica distribuida");
@@ -104,14 +104,17 @@ void hora_actual(FILE *fichero){
 
 void enviar_mensaje(long tipo, int destino, int emisor, int ticket, int prioridad){
 
-    key_t clave = generar_clave("pccd.c", destino);
-    int buzon = obtener_buzon(clave, IPC_EXCL);
+    key_t clave = generar_clave("/home/juan/PCCD_C/pccd.c", destino);
+    printf("La clave utilizada para enviar es %i\n", clave);
+    int buzon = obtener_buzon(clave, IPC_CREAT);
 
     struct mensaje_struct mensaje;
     mensaje.emisor = emisor;
     mensaje.prioridad = prioridad;
     mensaje.ticket = ticket;
     mensaje.mtype = tipo;
+
+    //printf("Emisor: %i, Prioridad: %i, Ticket: %i, Tipo: %li\n", mensaje.emisor, mensaje.prioridad, mensaje.ticket, mensaje.mtype);
 
     if(msgsnd(buzon, &mensaje, sizeof(mensaje)-sizeof(long), IPC_NOWAIT) == -1){
         perror("Error al enviar un mensaje_struct");
@@ -121,7 +124,7 @@ void enviar_mensaje(long tipo, int destino, int emisor, int ticket, int priorida
 
 void recibir_mensaje(long tipo, int receptor, int* emisor, int* ticket_origen, int* prioridad_vecino){
 
-    key_t clave = generar_clave("pccd.c", receptor);
+    key_t clave = generar_clave("/home/juan/PCCD_C/pccd.c", receptor);
     int buzon = obtener_buzon(clave, IPC_EXCL);
     struct mensaje_struct mensaje;
 
