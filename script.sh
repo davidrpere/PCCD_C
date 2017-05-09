@@ -4,10 +4,10 @@ if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
   echo -e "\n\nNECESARIO EJECUCION CON SUDO Y ENCONTRARSE DENTRO DE LA CARPETA PCCD_C."
   echo -e "NECESARIO CREAR UNA NUEVA TERMINA CON EL NOMBRE nuevaTerminal
 [Edit -> Preferences -> Profiles -> New].\n\n"
-  echo -e "Modo de uso: sudo ./script.sh nodo numero_de_nodos [compilar_y_monitorizar]\n"
+  echo -e "Modo de uso: sudo ./script.sh nodo numero_de_nodos [compilar_y_monitorizarD]\n"
   echo "-> nodo: numero del nodo que se va a ejecutar."
   echo "-> numero_de_nodos: numero de nodos que se van a ejecutar (minimo 2)."
-  echo -e "-> [compilar_y_monitorizar]: parametro opcional que compila los procesos:
+  echo -e "-> [compilar_y_monitorizarD]: parametro opcional que compila los procesos:
    inicializacion.c, lectores.c, pagos_anulaciones.c, prerreservas.c receptor.c.
    y lanza las terminales de registro_sc_local y registro_sc_distribuida para monitorizar.\n\n"
   exit 1
@@ -20,7 +20,7 @@ args=("$@")
 FIN=0
 
 if [ "$#" -eq 3 ]; then
-  if [ ${args[2]} = "compilar_y_monitorizar" ]; then
+  if [ ${args[2]} = "compilar_y_monitorizarD" ]; then
     ipcrm -a
     gcc -Wall inicializacion.c -o inicializacion -lpthread
     gcc -Wall lectores.c -o lectores -lpthread
@@ -32,12 +32,13 @@ if [ "$#" -eq 3 ]; then
 
     #--geometry=WidthxHeight+Xposition+Yposition
     gnome-terminal -e "./registro_sc_distribuida"  --window-with-profile=nuevaTerminal --geometry=60x20
-    gnome-terminal -e "./registro_sc_local 1"  --window-with-profile=nuevaTerminal --geometry=60x20
   else
-    echo "parametro [compilar_y_monitorizar] no correcto, escriba la palabra compilar_y_monitorizar."
+    echo "parametro [compilar_y_monitorizarD] no correcto, escriba la palabra compilar_y_monitorizarD."
     exit 1
   fi
 fi
+
+gnome-terminal -e "./registro_sc_local ${args[0]}"  --window-with-profile=nuevaTerminal --geometry=60x20
 
 file="registro_sc_distribuida.txt"
 read -d $'\x04' registro_sc_distribuida < "$file"
