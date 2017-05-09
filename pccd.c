@@ -75,31 +75,31 @@ void *asignar_memoria_compartida(int zona_memoria){
 
 void seccion_critica_local(char *mensaje, int nodo){
     FILE *fichero = fopen("/home/juan/PCCD_C/seccion_critica_local.txt", "a");
-    hora_actual(fichero);
-    if(fprintf(fichero, "%i %s\n", nodo, mensaje) < 0 || fclose(fichero) != 0){
-        perror("Error al escribir en la seccion critica local");
+    if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fclose(fichero) != 0){
+        perror("Error al escribir en la seccion critica distribuida");
         exit(-1);
     }
 }
 
 void seccion_critica_distribuda(char *mensaje, int nodo){
     FILE *fichero = fopen("/home/juan/PCCD_C/seccion_critica_distribuida.txt", "a");
-    hora_actual(fichero);
-    if(fprintf(fichero, "%i %s\n", nodo, mensaje) < 0 || fclose(fichero) != 0){
+    if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fclose(fichero) != 0){
         perror("Error al escribir en la seccion critica distribuida");
         exit(-1);
     }
 }
 
-void hora_actual(FILE *fichero){
+char *hora_actual(){
     time_t     ahora;
     struct tm *hora;
     char       buf[80];
+    char *p;
 
     ahora = time(0);
     hora = localtime(&ahora);
-    strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", hora);
-    fprintf(fichero, "%s\n", buf);
+    strftime(buf, sizeof(buf), "%H:%M:%S", hora);
+    p=&(buf[0]);
+    return p;
 }
 
 void enviar_mensaje(long tipo, int destino, int emisor, int ticket, int prioridad){

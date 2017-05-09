@@ -22,7 +22,6 @@ int *numero_escritores;
 int main(int argc, char *argv[]){
     if(argc != 3){
         printf("Modo de uso: ./pagos_anulaciones 'id_nodo' 'numero_nodos'\n");
-
         exit(0);
     }
     nodo = atoi(argv[1]);
@@ -66,7 +65,7 @@ int main(int argc, char *argv[]){
         fflush(stdin);
         if(numero == 0) exit(0);
         cuenta_atras(10);
-        hora_actual(stdout);
+        printf("%s\n", hora_actual());
         int i=0;
         pthread_t hilo;
         for(; i<numero; i++){
@@ -118,10 +117,11 @@ void *pago_anulacion(void *parametro){
 }
 
 void sistema_distribuido(){
-    int *quiero, *mi_ticket, *max_ticket, *num_pendientes, *id_nodos_pendientes, *mi_prioridad;
 
-    key_t clave_mi_ticket, clave_max_ticket, clave_id_nodos_pendientes, clave_num_pendientes, clave_quiero, clave_mi_prioridad;
-    int mem_comp_mi_ticket, mem_comp_max_ticket, mem_comp_id_nodos_pendientes, mem_comp_num_pendientes, mem_comp_quiero, mem_comp_mi_prioridad;
+    int *quiero, *mi_ticket, *max_ticket, *num_pendientes, *id_nodos_pendientes, *mi_prioridad, *dentro;
+
+    key_t clave_mi_ticket, clave_max_ticket, clave_id_nodos_pendientes, clave_num_pendientes, clave_quiero, clave_mi_prioridad, clave_dentro;
+    int mem_comp_mi_ticket, mem_comp_max_ticket, mem_comp_id_nodos_pendientes, mem_comp_num_pendientes, mem_comp_quiero, mem_comp_mi_prioridad, mem_comp_dentro;
 
     clave_mi_ticket = generar_clave("/home/juan/PCCD_C/receptor.c", -1 * nodo);
     clave_max_ticket = generar_clave("/home/juan/PCCD_C/lectores.c", -1 * nodo);
@@ -129,6 +129,7 @@ void sistema_distribuido(){
     clave_num_pendientes = generar_clave("/home/juan/PCCD_C/prerreservas.c", -1 * nodo);
     clave_quiero = generar_clave("/home/juan/PCCD_C/pccd.c", -1 * nodo);
     clave_mi_prioridad = generar_clave("/home/juan/PCCD_C/pccd.h", -1 * nodo);
+    clave_dentro = generar_clave("/home/juan/PCCD_C/inicializacion", -1 * nodo);
 
     mem_comp_mi_ticket = obtener_memoria_compartida(clave_mi_ticket, sizeof(int), IPC_EXCL);
     mem_comp_max_ticket = obtener_memoria_compartida(clave_max_ticket, sizeof(int), IPC_EXCL);
@@ -136,6 +137,7 @@ void sistema_distribuido(){
     mem_comp_num_pendientes = obtener_memoria_compartida(clave_num_pendientes, sizeof(int), IPC_EXCL);
     mem_comp_quiero = obtener_memoria_compartida(clave_quiero, sizeof(int), IPC_EXCL);
     mem_comp_mi_prioridad = obtener_memoria_compartida(clave_mi_prioridad, sizeof(int), IPC_EXCL);
+    mem_comp_dentro = obtener_memoria_compartida(clave_dentro, sizeof(int), IPC_EXCL);
 
     mi_ticket = asignar_memoria_compartida(mem_comp_mi_ticket);
     max_ticket = asignar_memoria_compartida(mem_comp_max_ticket);
@@ -143,30 +145,43 @@ void sistema_distribuido(){
     num_pendientes = asignar_memoria_compartida(mem_comp_num_pendientes);
     quiero = asignar_memoria_compartida(mem_comp_quiero);
     mi_prioridad = asignar_memoria_compartida(mem_comp_mi_prioridad);
+    dentro = asignar_memoria_compartida(mem_comp_dentro);
 
+    printf("Esperando a crear mi peticion...\n");
     wait(semaforo_atomico);
     *quiero = 1;
     *mi_ticket = *max_ticket +1;
     *mi_prioridad = PAGO_ANULACION;
     post(semaforo_atomico);
+    printf("Peticion creada\n");
 
     int emisor, ticket_origen, prioridad_origen;
 
     int i;
+    printf("Enviando peticiones...\n");
     for(i=1; i<=num_nodos; i++){
         if(i != nodo){
             enviar_mensaje(REQUEST, i, nodo, *mi_ticket, *mi_prioridad);
         }
     }
+    printf("Peticiones enviadas\nEsperando por las confirmaciones...\n");
     for(i=1; i<=num_nodos-1; i++){
         recibir_mensaje(REPLY, nodo, &emisor, &ticket_origen, &prioridad_origen);
     }
+    printf("Tengo todas las confirmaciones\nDentro de la SC distribuida\n");
+    wait(semaforo_atomico);
+    *dentro = 1;
+    post(semaforo_atomico);
     //SC
     seccion_critica_distribuda("Pago o anulacion ha entrado en la SC distribuida", nodo);
     sleep(1);
     seccion_critica_distribuda("Pago o anulacion ha salido de la SC distribuida", nodo);
     sleep(1);
     //distribuida
+    printf("Fuera de la SC distribuida\nAtendiendo peticiones pendientes...\n");
+    wait(semaforo_atomico);
+    *dentro = 0;
+    post(semaforo_atomico);
 
     wait(semaforo_atomico);
     *quiero = 0;
@@ -175,5 +190,5 @@ void sistema_distribuido(){
     }
     *num_pendientes=0;
     post(semaforo_atomico);
-
+    printf("Peticiones pendientes atendidas\n");
 }
