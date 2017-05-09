@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <sys/msg.h>
+#include <signal.h>
 
 #define PAGO_ANULACION 3
 #define PRERRESERVA 2
@@ -34,6 +35,6 @@ char *hora_actual();
 void enviar_mensaje(long tipo, int destino, int emisor, int ticket, int prioridad);
 void recibir_mensaje(long tipo, int receptor, int* emisor, int* ticket_origen, int* prioridad_vecino);
 int obtener_buzon(key_t clave, int modo);
-void seccion_critica_distribuda(char *mensaje, int nodo);
-void seccion_critica_local(char *mensaje, int nodo);
+void seccion_critica_distribuda(char *mensaje, int nodo, pid_t pid_sc, int tipo, int entrar);
+void seccion_critica_local(char *mensaje, int nodo, pid_t pid_sc, int tipo, int entrar);
 void cuenta_atras(int segundos);

@@ -17,14 +17,17 @@ sem_t* semaforo_atomico;
 int nodo;
 int num_nodos;
 int* numero_escritores;
+pid_t pid_sc_local, pid_sc_distribuida;
 
 int main(int argc, char *argv[]){
-    if(argc != 3){
-        printf("Modo de uso: ./prerreservas 'id_nodo' 'numero_nodos'\n");
+    if(argc != 5){
+        printf("Modo de uso: ./prerreservas 'id_nodo' 'numero_nodos' 'pid_sc_local' 'pid_sc_distribuido'\n");
         exit(0);
     }
     nodo = atoi(argv[1]);
     num_nodos = atoi(argv[2]);
+    pid_sc_local = atoi(argv[3]);
+    pid_sc_distribuida = atoi(argv[4]);
 
     inicializar_semaforo(&semaforo_contador_local, 1);
 
@@ -86,9 +89,9 @@ void *prerreserva(void *parametro){
     wait(semaforo_prerreservas);
     wait(semaforo_prioridades);
 
-    seccion_critica_local("Prerreserva ha entrado en la SC local", nodo);
+    seccion_critica_local("Prerreserva ha entrado en la SC local", nodo, pid_sc_local, PRERRESERVA, 1);
     sistema_distribuido();
-    seccion_critica_local("Prerreserva ha salido de la SC local", nodo);
+    seccion_critica_local("Prerreserva ha salido de la SC local", nodo, pid_sc_local, PRERRESERVA, 0);
 
     post(semaforo_prioridades);
     post(semaforo_prerreservas);
@@ -151,18 +154,22 @@ void sistema_distribuido(){
     for(i=1; i<=num_nodos-1; i++){
         recibir_mensaje(REPLY, nodo, &emisor, &ticket_origen, &prioridad_origen);
     }
-    //SC
+
+
     wait(semaforo_atomico);
     *dentro = 1;
     post(semaforo_atomico);
-    seccion_critica_distribuda("Prerreserva ha entrado en la SC distribuida", nodo);
+
+    //SC
+    seccion_critica_distribuda("Prerreserva ha entrado en la SC distribuida", nodo, pid_sc_distribuida, PRERRESERVA, 1);
     sleep(1);
-    seccion_critica_distribuda("Prerreserva ha salido de la SC distribuida", nodo);
-    sleep(1);
+    seccion_critica_distribuda("Prerreserva ha salido de la SC distribuida", nodo, pid_sc_distribuida, PRERRESERVA, 0);
+    //distribuida
+
     wait(semaforo_atomico);
     *dentro = 0;
     post(semaforo_atomico);
-    //distribuida
+
 
     wait(semaforo_atomico);
     *quiero = 0;

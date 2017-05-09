@@ -15,14 +15,17 @@ int nodo;
 int num_nodos;
 int numero_lectores_local;
 int numero_lectores_distribuido;
+pid_t pid_sc_local, pid_sc_distribuida;
 
-int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        printf("Modo de uso: ./lectores 'id_nodo' 'numero_nodos'\n");
+int main(int argc, char *argv[]){
+    if(argc != 5){
+        printf("Modo de uso: ./lectores 'id_nodo' 'numero_nodos' 'pid_sc_local' 'pid_sc_distribuido'\n");
         exit(0);
     }
     nodo = atoi(argv[1]);
     num_nodos = atoi(argv[2]);
+    pid_sc_local = atoi(argv[3]);
+    pid_sc_distribuida = atoi(argv[4]);
 
     inicializar_semaforo(&semaforo_contador_local, 1);
     inicializar_semaforo(&semaforo_permiso, 1);
@@ -81,9 +84,9 @@ void *lector(void* parametro){
     numero_lectores_local++;
     post(&semaforo_contador_local);
 
-    seccion_critica_local("Grada o evento ha entrado en la SC local", nodo);
+    seccion_critica_local("Grada o evento ha entrado en la SC local", nodo, pid_sc_local, LECTOR, 1);
     sistema_distribuido();
-    seccion_critica_local("Grada o evento ha salido de la SC local", nodo);
+    seccion_critica_local("Grada o evento ha salido de la SC local", nodo, pid_sc_local, LECTOR, 0);
 
     wait(&semaforo_contador_local);
     numero_lectores_local--;
@@ -157,10 +160,9 @@ void sistema_distribuido(){
 
     post(&semaforo_permiso);
     //SC
-    seccion_critica_distribuda("Lector ha entrado en la SC distribuida", nodo);
+    seccion_critica_distribuda("Lector ha entrado en la SC distribuida", nodo, pid_sc_distribuida, LECTOR, 1);
     sleep(1);
-    seccion_critica_distribuda("Lector ha salido de la SC distribuida", nodo);
-    sleep(1);
+    seccion_critica_distribuda("Lector ha salido de la SC distribuida", nodo, pid_sc_distribuida, LECTOR, 0);
     //distribuida
 
     wait(&semaforo_contador_distribuido);

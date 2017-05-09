@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <signal.h>
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
@@ -24,8 +24,11 @@ int main(int argc, char *argv[]) {
     sigaction(SIGALRM, &act, NULL);
     sigaction(SIGUSR1, &act, NULL);
     sigaction(SIGUSR2, &act, NULL);
+    sigaction(5, &act, NULL);
+    sigaction(6, &act, NULL);
+    sigaction(7, &act, NULL);
 
-    printf("PID proceso SC distribuida %d: %d\n\n", nodo, getpid());
+    printf("PID proceso SC distribuida: %d\n\n", getpid());
 
     while(1){
         pause();
@@ -40,25 +43,29 @@ int main(int argc, char *argv[]) {
  * @param signum
  */
 
-void handler(int signum){
+void handler(int signum) {
     switch (signum) {
         case SIGUSR1:
             //pago_anulacion en SC
-            printf(ANSI_COLOR_RED     "%d PROCESO PAGO o ANULACIÓN EN SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            printf(ANSI_COLOR_RED     "%d PROCESO PAGO o ANULACIÓN EN SECCIÓN CRÍTICA DISTRIBUIDA"     ANSI_COLOR_RESET "\n",
+                   i);
             i++;
             break;
         case SIGUSR2:
             //prerreserva en SC
-            printf(ANSI_COLOR_GREEN     "%d PROCESO PRERRESERVA EN SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            printf(ANSI_COLOR_GREEN     "%d PROCESO PRERRESERVA EN SECCIÓN CRÍTICA DISTRIBUIDA"     ANSI_COLOR_RESET "\n",
+                   i);
             i++;
             break;
         case SIGALRM:
             //lector en SC
-            printf(ANSI_COLOR_YELLOW     "%d PROCESO GRADAS o EVENTOS EN SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            printf(ANSI_COLOR_YELLOW     "%d PROCESO GRADAS o EVENTOS EN SECCIÓN CRÍTICA DISTRIBUIDA"     ANSI_COLOR_RESET "\n",
+                   i);
             i++;
             break;
         case 5:
-            printf(ANSI_COLOR_RED     "%d PROCESO PAGO o ANULACIÓN SALE DE SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            printf(ANSI_COLOR_RED     "%d PROCESO PAGO o ANULACIÓN SALE DE SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n",
+                   i);
             i++;
             break;
         case 6:
@@ -66,12 +73,12 @@ void handler(int signum){
             i++;
             break;
         case 7:
-            printf(ANSI_COLOR_YELLOW     "%d PROCESO GRADAS o EVENTOS SALE DE SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            printf(ANSI_COLOR_YELLOW     "%d PROCESO GRADAS o EVENTOS SALE DE SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n",
+                   i);
             i++;
             break;
         default:
             //por ver
             break;
     }
-    return;
 }

@@ -18,14 +18,17 @@ int nodo;
 int num_nodos;
 int numero_pagos_anulaciones;
 int *numero_escritores;
+pid_t pid_sc_local, pid_sc_distribuida;
 
 int main(int argc, char *argv[]){
-    if(argc != 3){
-        printf("Modo de uso: ./pagos_anulaciones 'id_nodo' 'numero_nodos'\n");
+    if(argc != 5){
+        printf("Modo de uso: ./pagos_anulaciones 'id_nodo' 'numero_nodos' 'pid_sc_local' 'pid_sc_distribuido'\n");
         exit(0);
     }
     nodo = atoi(argv[1]);
     num_nodos = atoi(argv[2]);
+    pid_sc_local = atoi(argv[3]);
+    pid_sc_distribuida = atoi(argv[4]);
 
     inicializar_semaforo(&semaforo_contador_local, 1);
     numero_pagos_anulaciones = 0;
@@ -93,7 +96,7 @@ void *pago_anulacion(void *parametro){
 
     wait(semaforo_pagos_anulaciones);
 
-    seccion_critica_local("Pago o anulacion ha entrado en la SC", nodo);
+    seccion_critica_local("Pago o anulacion ha entrado en la SC", nodo, pid_sc_local, PAGO_ANULACION, 1);
     sistema_distribuido();
 
     wait(&semaforo_contador_local);
@@ -110,7 +113,7 @@ void *pago_anulacion(void *parametro){
     }
     post(semaforo_escritores);
 
-    seccion_critica_local("Pago o anulacion ha salido de la SC", nodo);
+    seccion_critica_local("Pago o anulacion ha salido de la SC", nodo, pid_sc_local, PAGO_ANULACION, 0);
     post(semaforo_pagos_anulaciones);
 
     pthread_exit(NULL);
@@ -172,12 +175,13 @@ void sistema_distribuido(){
     wait(semaforo_atomico);
     *dentro = 1;
     post(semaforo_atomico);
+
     //SC
-    seccion_critica_distribuda("Pago o anulacion ha entrado en la SC distribuida", nodo);
+    seccion_critica_distribuda("Pago o anulacion ha entrado en la SC distribuida", nodo, pid_sc_distribuida, PAGO_ANULACION, 1);
     sleep(1);
-    seccion_critica_distribuda("Pago o anulacion ha salido de la SC distribuida", nodo);
-    sleep(1);
+    seccion_critica_distribuda("Pago o anulacion ha salido de la SC distribuida", nodo, pid_sc_distribuida, PAGO_ANULACION, 0);
     //distribuida
+
     printf("Fuera de la SC distribuida\nAtendiendo peticiones pendientes...\n");
     wait(semaforo_atomico);
     *dentro = 0;

@@ -73,20 +73,66 @@ void *asignar_memoria_compartida(int zona_memoria){
     return asignacion;
 }
 
-void seccion_critica_local(char *mensaje, int nodo){
+void seccion_critica_local(char *mensaje, int nodo, pid_t pid_sc, int tipo, int entrar){
     FILE *fichero = fopen("/home/juan/PCCD_C/seccion_critica_local.txt", "a");
     if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fclose(fichero) != 0){
         perror("Error al escribir en la seccion critica distribuida");
         exit(-1);
     }
+    switch(tipo){
+        case LECTOR:
+            if(entrar)
+                kill(pid_sc, SIGALRM);
+            else
+                kill(pid_sc, 7);
+            break;
+        case PRERRESERVA:
+            if(entrar)
+                kill(pid_sc, SIGUSR2);
+            else
+                kill(pid_sc, 6);
+            break;
+        case PAGO_ANULACION:
+            if(entrar)
+                kill(pid_sc, SIGUSR1);
+            else
+                kill(pid_sc, 5);
+            break;
+        default:
+            exit(0);
+    }
+    sleep(1);
 }
 
-void seccion_critica_distribuda(char *mensaje, int nodo){
+void seccion_critica_distribuda(char *mensaje, int nodo, pid_t pid_sc, int tipo, int entrar){
     FILE *fichero = fopen("/home/juan/PCCD_C/seccion_critica_distribuida.txt", "a");
     if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fclose(fichero) != 0){
         perror("Error al escribir en la seccion critica distribuida");
         exit(-1);
     }
+    switch(tipo){
+        case LECTOR:
+            if(entrar)
+                kill(pid_sc, SIGALRM);
+            else
+                kill(pid_sc, 7);
+            break;
+        case PRERRESERVA:
+            if(entrar)
+                kill(pid_sc, SIGUSR2);
+            else
+                kill(pid_sc, 6);
+            break;
+        case PAGO_ANULACION:
+            if(entrar)
+                kill(pid_sc, SIGUSR1);
+            else
+                kill(pid_sc, 5);
+            break;
+        default:
+            exit(0);
+    }
+    sleep(1);
 }
 
 char *hora_actual(){
