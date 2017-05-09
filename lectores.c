@@ -58,6 +58,7 @@ int main(int argc, char* argv[]) {
         scanf(" %i", &numero);
         fflush(stdin);
         if (numero == 0) exit(0);
+        cuenta_atras(10);
         hora_actual(stdout);
         int i = 0;
         pthread_t hilo;
@@ -83,7 +84,6 @@ void *lector(void* parametro){
 
     seccion_critica_local("Grada o evento ha entrado en la SC local", nodo);
     sistema_distribuido();
-    sleep(10);
     seccion_critica_local("Grada o evento ha salido de la SC local", nodo);
 
     wait(&semaforo_contador_local);
@@ -153,8 +153,9 @@ void sistema_distribuido(){
     post(&semaforo_permiso);
     //SC
     seccion_critica_distribuda("Lector ha entrado en la SC distribuida", nodo);
-    sleep(10);
+    sleep(1);
     seccion_critica_distribuda("Lector ha salido de la SC distribuida", nodo);
+    sleep(1);
     //distribuida
 
     wait(&semaforo_contador_distribuido);

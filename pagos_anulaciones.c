@@ -64,6 +64,7 @@ int main(int argc, char *argv[]){
         scanf(" %i", &numero);
         fflush(stdin);
         if(numero == 0) exit(0);
+        cuenta_atras(10);
         hora_actual(stdout);
         int i=0;
         pthread_t hilo;
@@ -94,7 +95,6 @@ void *pago_anulacion(void *parametro){
 
     seccion_critica_local("Pago o anulacion ha entrado en la SC", nodo);
     sistema_distribuido();
-    sleep(1);
 
     wait(&semaforo_contador_local);
     numero_pagos_anulaciones--;
@@ -162,9 +162,10 @@ void sistema_distribuido(){
         recibir_mensaje(REPLY, nodo, &emisor, &ticket_origen, &prioridad_origen);
     }
     //SC
-    seccion_critica_distribuda("Pago o anulacion ha entrado en la SC", nodo);
-    sleep(10);
-    seccion_critica_distribuda("Pago o anulacion ha salido de la SC", nodo);
+    seccion_critica_distribuda("Pago o anulacion ha entrado en la SC distribuida", nodo);
+    sleep(1);
+    seccion_critica_distribuda("Pago o anulacion ha salido de la SC distribuida", nodo);
+    sleep(1);
     //distribuida
 
     wait(semaforo_atomico);

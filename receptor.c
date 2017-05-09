@@ -46,8 +46,6 @@ int main(int argc, char* argv[]) {
 
     /***************************************************************************************/
 
-    /*************************************************************************************/
-
     key_t clave_atomico = generar_clave("/home/juan/PCCD_C/inicializacion.c", -1*nodo);
     int mem_comp_atomico = obtener_memoria_compartida(clave_atomico, sizeof(sem_t), IPC_CREAT);
     sem_t *semaforo_atomico = asignar_memoria_compartida(mem_comp_atomico);
@@ -58,15 +56,17 @@ int main(int argc, char* argv[]) {
     while (1) {
         printf("Esperando una peticion...\n");
         recibir_mensaje(REQUEST, nodo, &vecino, &ticket_vecino, &prioridad_vecino);
-        printf("He recidido un mensaje del nodo %i con prioridad %i\n", vecino, prioridad_vecino);
+        printf("He recibido un mensaje del nodo %i con prioridad %i\n", vecino, prioridad_vecino);
         wait(semaforo_atomico);
         *max_ticket = maximo(ticket_vecino, *max_ticket);
         //wait(semaforo_atomico);
+        printf("Yo quiero: %i, Mi ticket: %i, Max ticket: %i, Mi prioridad: %i\n", *quiero, *mi_ticket, *max_ticket, *mi_prioridad);
         if(*quiero != 1 || *mi_prioridad < prioridad_vecino ||
                 (*mi_prioridad == prioridad_vecino && *mi_ticket > ticket_vecino) ||
                 (*mi_prioridad == prioridad_vecino && *mi_ticket == ticket_vecino && nodo > vecino) ||
                 (*mi_prioridad == LECTOR && prioridad_vecino == LECTOR)){
             enviar_mensaje(REPLY, vecino, nodo, 0, *mi_prioridad);
+            printf("Doy permiso al nodo %i con prioridad %i y ticket %i\n", vecino, prioridad_vecino, ticket_vecino);
         }else{
             id_nodos_pendientes[*num_pendientes] = vecino;
             *num_pendientes = *num_pendientes +1;

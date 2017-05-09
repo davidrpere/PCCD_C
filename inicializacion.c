@@ -49,8 +49,11 @@ int main(int argc, char *argv[]){
     printf("Memoria compartida inicializada correctamente\n");
 
     if(remove("seccion_critica_local.txt") != 0){
-        perror("Error al eliminar la SC");
-        exit(-1);
+        perror("Error al eliminar la SC local");
+    }
+
+    if(remove("seccion_critica_distribuida.txt") != 0){
+        perror("Error al eliminar la SC distribuida");
     }
 
     return 0;

@@ -105,7 +105,6 @@ void hora_actual(FILE *fichero){
 void enviar_mensaje(long tipo, int destino, int emisor, int ticket, int prioridad){
 
     key_t clave = generar_clave("/home/juan/PCCD_C/pccd.c", destino);
-    printf("La clave utilizada para enviar es %i\n", clave);
     int buzon = obtener_buzon(clave, IPC_CREAT);
 
     struct mensaje_struct mensaje;
@@ -160,4 +159,16 @@ int obtener_buzon(key_t clave, int modo){
         }
     }
     return buzon;
+}
+
+void cuenta_atras(int segundos){
+    int i;
+    for(i=0; i<segundos; i++){
+        printf("%i", i);
+        fflush(stdout);
+        sleep(1);
+        printf(", ");
+        fflush(stdout);
+    }
+    printf("YAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
 }

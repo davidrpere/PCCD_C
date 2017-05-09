@@ -62,6 +62,7 @@ int main(int argc, char *argv[]){
         scanf(" %i", &numero);
         fflush(stdin);
         if(numero == 0) exit(0);
+        cuenta_atras(10);
         hora_actual(stdout);
         int i=0;
         pthread_t hilo;
@@ -87,7 +88,6 @@ void *prerreserva(void *parametro){
 
     seccion_critica_local("Prerreserva ha entrado en la SC local", nodo);
     sistema_distribuido();
-    sleep(1);
     seccion_critica_local("Prerreserva ha salido de la SC local", nodo);
 
     post(semaforo_prioridades);
@@ -150,8 +150,9 @@ void sistema_distribuido(){
     }
     //SC
     seccion_critica_distribuda("Prerreserva ha entrado en la SC distribuida", nodo);
-    sleep(10);
+    sleep(1);
     seccion_critica_distribuda("Prerreserva ha salido de la SC distribuida", nodo);
+    sleep(1);
     //distribuida
 
     wait(semaforo_atomico);
