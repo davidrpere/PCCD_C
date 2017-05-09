@@ -4,7 +4,7 @@ if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
   echo -e "\n\nNECESARIO EJECUCION CON SUDO Y ENCONTRARSE DENTRO DE LA CARPETA PCCD_C."
   echo -e "NECESARIO CREAR UNA NUEVA TERMINA CON EL NOMBRE nuevaTerminal
 [Edit -> Preferences -> Profiles -> New].\n\n"
-  echo -e "Modo de uso: sudo ./script.sh nodo numero_de_nodos [compilar_y_crearRegistrosSC]\n"
+  echo -e "Modo de uso: sudo ./script.sh nodo numero_de_nodos [compilar_y_monitorizar]\n"
   echo "-> nodo: numero del nodo que se va a ejecutar."
   echo "-> numero_de_nodos: numero de nodos que se van a ejecutar (minimo 2)."
   echo -e "-> [compilar_y_monitorizar]: parametro opcional que compila los procesos:
