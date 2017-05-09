@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
 
-    int nodo = argv[1];
+    int nodo = atoi(argv[1]);
 
     struct sigaction act;
 
@@ -62,6 +62,18 @@ void handler(int signum){
         case SIGALRM:
             //lector en SC
             printf(ANSI_COLOR_YELLOW     "%d PROCESO GRADAS o EVENTOS EN SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            i++;
+            break;
+        case 5:
+            printf(ANSI_COLOR_RED     "%d PROCESO PAGO o ANULACIÓN SALE DE SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            i++;
+            break;
+        case 6:
+            printf(ANSI_COLOR_GREEN     "%d PROCESO PRERRESERVA SALE DE SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            i++;
+            break;
+        case 7:
+            printf(ANSI_COLOR_YELLOW     "%d PROCESO GRADAS o EVENTOS SALE DE SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
             i++;
             break;
         default:

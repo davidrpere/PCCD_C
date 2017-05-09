@@ -44,17 +44,29 @@ void handler(int signum){
     switch (signum) {
         case SIGUSR1:
             //pago_anulacion en SC
-            printf(ANSI_COLOR_RED     "%d PROCESO PAGO o ANULACIÓN EN SECCIÓN CRÍTICA DISTRIBUIDA"     ANSI_COLOR_RESET "\n", i);
+            printf(ANSI_COLOR_RED     "%d PROCESO PAGO o ANULACIÓN EN SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
             i++;
             break;
         case SIGUSR2:
             //prerreserva en SC
-            printf(ANSI_COLOR_GREEN     "%d PROCESO PRERRESERVA EN SECCIÓN CRÍTICA DISTRIBUIDA"     ANSI_COLOR_RESET "\n", i);
+            printf(ANSI_COLOR_GREEN     "%d PROCESO PRERRESERVA EN SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
             i++;
             break;
         case SIGALRM:
             //lector en SC
-            printf(ANSI_COLOR_YELLOW     "%d PROCESO GRADAS o EVENTOS EN SECCIÓN CRÍTICA DISTRIBUIDA"     ANSI_COLOR_RESET "\n", i);
+            printf(ANSI_COLOR_YELLOW     "%d PROCESO GRADAS o EVENTOS EN SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            i++;
+            break;
+        case 5:
+            printf(ANSI_COLOR_RED     "%d PROCESO PAGO o ANULACIÓN SALE DE SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            i++;
+            break;
+        case 6:
+            printf(ANSI_COLOR_GREEN     "%d PROCESO PRERRESERVA SALE DE SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
+            i++;
+            break;
+        case 7:
+            printf(ANSI_COLOR_YELLOW     "%d PROCESO GRADAS o EVENTOS SALE DE SECCIÓN CRÍTICA"     ANSI_COLOR_RESET "\n", i);
             i++;
             break;
         default:
