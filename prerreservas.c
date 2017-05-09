@@ -21,7 +21,6 @@ int* numero_escritores;
 int main(int argc, char *argv[]){
     if(argc != 3){
         printf("Modo de uso: ./prerreservas 'id_nodo' 'numero_nodos'\n");
-
         exit(0);
     }
     nodo = atoi(argv[1]);
@@ -64,7 +63,7 @@ int main(int argc, char *argv[]){
         fflush(stdin);
         if(numero == 0) exit(0);
         cuenta_atras(10);
-        hora_actual(stdout);
+        printf("%s\n", hora_actual());
         int i=0;
         pthread_t hilo;
         for(; i<numero; i++){
@@ -106,10 +105,10 @@ void *prerreserva(void *parametro){
 
 void sistema_distribuido(){
 
-    int *quiero, *mi_ticket, *max_ticket, *num_pendientes, *id_nodos_pendientes, *mi_prioridad;
+    int *quiero, *mi_ticket, *max_ticket, *num_pendientes, *id_nodos_pendientes, *mi_prioridad, *dentro;
 
-    key_t clave_mi_ticket, clave_max_ticket, clave_id_nodos_pendientes, clave_num_pendientes, clave_quiero, clave_mi_prioridad;
-    int mem_comp_mi_ticket, mem_comp_max_ticket, mem_comp_id_nodos_pendientes, mem_comp_num_pendientes, mem_comp_quiero, mem_comp_mi_prioridad;
+    key_t clave_mi_ticket, clave_max_ticket, clave_id_nodos_pendientes, clave_num_pendientes, clave_quiero, clave_mi_prioridad, clave_dentro;
+    int mem_comp_mi_ticket, mem_comp_max_ticket, mem_comp_id_nodos_pendientes, mem_comp_num_pendientes, mem_comp_quiero, mem_comp_mi_prioridad, mem_comp_dentro;
 
     clave_mi_ticket = generar_clave("/home/juan/PCCD_C/receptor.c", -1 * nodo);
     clave_max_ticket = generar_clave("/home/juan/PCCD_C/lectores.c", -1 * nodo);
@@ -117,6 +116,7 @@ void sistema_distribuido(){
     clave_num_pendientes = generar_clave("/home/juan/PCCD_C/prerreservas.c", -1 * nodo);
     clave_quiero = generar_clave("/home/juan/PCCD_C/pccd.c", -1 * nodo);
     clave_mi_prioridad = generar_clave("/home/juan/PCCD_C/pccd.h", -1 * nodo);
+    clave_dentro = generar_clave("/home/juan/PCCD_C/inicializacion", -1 * nodo);
 
     mem_comp_mi_ticket = obtener_memoria_compartida(clave_mi_ticket, sizeof(int), IPC_EXCL);
     mem_comp_max_ticket = obtener_memoria_compartida(clave_max_ticket, sizeof(int), IPC_EXCL);
@@ -124,6 +124,7 @@ void sistema_distribuido(){
     mem_comp_num_pendientes = obtener_memoria_compartida(clave_num_pendientes, sizeof(int), IPC_EXCL);
     mem_comp_quiero = obtener_memoria_compartida(clave_quiero, sizeof(int), IPC_EXCL);
     mem_comp_mi_prioridad = obtener_memoria_compartida(clave_mi_prioridad, sizeof(int), IPC_EXCL);
+    mem_comp_dentro = obtener_memoria_compartida(clave_dentro, sizeof(int), IPC_EXCL);
 
     mi_ticket = asignar_memoria_compartida(mem_comp_mi_ticket);
     max_ticket = asignar_memoria_compartida(mem_comp_max_ticket);
@@ -131,6 +132,7 @@ void sistema_distribuido(){
     num_pendientes = asignar_memoria_compartida(mem_comp_num_pendientes);
     quiero = asignar_memoria_compartida(mem_comp_quiero);
     mi_prioridad = asignar_memoria_compartida(mem_comp_mi_prioridad);
+    dentro = asignar_memoria_compartida(mem_comp_dentro);
 
     wait(semaforo_atomico);
     *quiero = 1;
@@ -150,10 +152,16 @@ void sistema_distribuido(){
         recibir_mensaje(REPLY, nodo, &emisor, &ticket_origen, &prioridad_origen);
     }
     //SC
+    wait(semaforo_atomico);
+    *dentro = 1;
+    post(semaforo_atomico);
     seccion_critica_distribuda("Prerreserva ha entrado en la SC distribuida", nodo);
     sleep(1);
     seccion_critica_distribuda("Prerreserva ha salido de la SC distribuida", nodo);
     sleep(1);
+    wait(semaforo_atomico);
+    *dentro = 0;
+    post(semaforo_atomico);
     //distribuida
 
     wait(semaforo_atomico);
