@@ -34,6 +34,14 @@ int main(int argc, char *argv[]) {
 
     printf("PID proceso SC local nodo %d: %d\n\n", nodo, getpid());
 
+    FILE *fichero = fopen("registro_sc_local.txt", "w");
+    if(fichero == NULL){
+        printf("Error opening file!\n");
+        exit(-1);
+    }
+    fprintf(fichero, "%i", getpid());
+    fclose(fichero);
+
     while(1){
         pause();
     }
