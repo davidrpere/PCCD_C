@@ -21,6 +21,7 @@ add_library(pccd pccd.c)
 
 include_directories("${PROJECT_BINARY_DIR}")
 
+
 set(
         CMAKE_RUNTIME_OUTPUT_DIRECTORY
         ${CMAKE_SOURCE_DIR}/out

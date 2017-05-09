@@ -19,6 +19,7 @@ int numero_lectores_distribuido;
 int main(int argc, char* argv[]) {
     if (argc != 3) {
         printf("Modo de uso: ./lectores 'id_nodo' 'numero_nodos'\n");
+
         exit(0);
     }
     nodo = atoi(argv[1]);
@@ -170,4 +171,5 @@ void sistema_distribuido(){
         post(semaforo_atomico);
     }
     post(&semaforo_contador_distribuido);
+
 }

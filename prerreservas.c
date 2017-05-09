@@ -21,6 +21,7 @@ int* numero_escritores;
 int main(int argc, char *argv[]){
     if(argc != 3){
         printf("Modo de uso: ./prerreservas 'id_nodo' 'numero_nodos'\n");
+
         exit(0);
     }
     nodo = atoi(argv[1]);

@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <signal.h>
 #include <string.h>
 #include <stdlib.h>
+
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
@@ -21,9 +21,9 @@ int main(int argc, char *argv[]) {
     act.sa_handler = handler;
     act.sa_flags = 0;
 
-    for (int i = 5; i <= 32; ++i) {
-        sigaction(i, &act, NULL);
-    }
+    sigaction(SIGALRM, &act, NULL);
+    sigaction(SIGUSR1, &act, NULL);
+    sigaction(SIGUSR2, &act, NULL);
 
     printf("PID proceso SC distribuida %d: %d\n\n", nodo, getpid());
 

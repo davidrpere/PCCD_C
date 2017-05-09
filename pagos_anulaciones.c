@@ -22,6 +22,7 @@ int *numero_escritores;
 int main(int argc, char *argv[]){
     if(argc != 3){
         printf("Modo de uso: ./pagos_anulaciones 'id_nodo' 'numero_nodos'\n");
+
         exit(0);
     }
     nodo = atoi(argv[1]);
@@ -117,7 +118,6 @@ void *pago_anulacion(void *parametro){
 }
 
 void sistema_distribuido(){
-
     int *quiero, *mi_ticket, *max_ticket, *num_pendientes, *id_nodos_pendientes, *mi_prioridad;
 
     key_t clave_mi_ticket, clave_max_ticket, clave_id_nodos_pendientes, clave_num_pendientes, clave_quiero, clave_mi_prioridad;
@@ -175,4 +175,5 @@ void sistema_distribuido(){
     }
     *num_pendientes=0;
     post(semaforo_atomico);
+
 }

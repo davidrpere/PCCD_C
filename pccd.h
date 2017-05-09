@@ -23,6 +23,7 @@ struct mensaje_struct{
     int prioridad;
 };
 
+
 void wait(sem_t *semaforo);
 void post(sem_t *semaforo);
 void inicializar_semaforo(sem_t *semaforo, unsigned int valor);
