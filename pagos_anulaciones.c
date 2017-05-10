@@ -67,7 +67,6 @@ int main(int argc, char *argv[]){
         scanf(" %i", &numero);
         fflush(stdin);
         if(numero == 0) exit(0);
-        cuenta_atras(10);
         printf("%s\n", hora_actual());
         int i=0;
         pthread_t hilo;
@@ -150,39 +149,33 @@ void sistema_distribuido(){
     mi_prioridad = asignar_memoria_compartida(mem_comp_mi_prioridad);
     dentro = asignar_memoria_compartida(mem_comp_dentro);
 
-    printf("Esperando a crear mi peticion...\n");
     wait(semaforo_atomico);
     *quiero = 1;
     *mi_ticket = *max_ticket +1;
     *mi_prioridad = PAGO_ANULACION;
     post(semaforo_atomico);
-    printf("Peticion creada\n");
 
     int emisor, ticket_origen, prioridad_origen;
 
     int i;
-    printf("Enviando peticiones...\n");
     for(i=1; i<=num_nodos; i++){
         if(i != nodo){
             enviar_mensaje(REQUEST, i, nodo, *mi_ticket, *mi_prioridad);
         }
     }
-    printf("Peticiones enviadas\nEsperando por las confirmaciones...\n");
     for(i=1; i<=num_nodos-1; i++){
         recibir_mensaje(REPLY, nodo, &emisor, &ticket_origen, &prioridad_origen);
     }
-    printf("Tengo todas las confirmaciones\nDentro de la SC distribuida\n");
     wait(semaforo_atomico);
     *dentro = 1;
     post(semaforo_atomico);
 
     //SC
     seccion_critica_distribuda("Pago o anulacion ha entrado en la SC distribuida", nodo, pid_sc_distribuida, PAGO_ANULACION, 1);
-    sleep(1);
+    sleep(2);
     seccion_critica_distribuda("Pago o anulacion ha salido de la SC distribuida", nodo, pid_sc_distribuida, PAGO_ANULACION, 0);
     //distribuida
 
-    printf("Fuera de la SC distribuida\nAtendiendo peticiones pendientes...\n");
     wait(semaforo_atomico);
     *dentro = 0;
     post(semaforo_atomico);
@@ -194,5 +187,4 @@ void sistema_distribuido(){
     }
     *num_pendientes=0;
     post(semaforo_atomico);
-    printf("Peticiones pendientes atendidas\n");
 }

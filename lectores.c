@@ -61,7 +61,6 @@ int main(int argc, char *argv[]){
         scanf(" %i", &numero);
         fflush(stdin);
         if (numero == 0) exit(0);
-        cuenta_atras(10);
         int i = 0;
         pthread_t hilo;
         for (; i < numero; i++) {
@@ -161,7 +160,7 @@ void sistema_distribuido(){
     post(&semaforo_permiso);
     //SC
     seccion_critica_distribuda("Lector ha entrado en la SC distribuida", nodo, pid_sc_distribuida, LECTOR, 1);
-    sleep(1);
+    sleep(2);
     seccion_critica_distribuda("Lector ha salido de la SC distribuida", nodo, pid_sc_distribuida, LECTOR, 0);
     //distribuida
 
@@ -169,7 +168,7 @@ void sistema_distribuido(){
     numero_lectores_distribuido--;
     if(numero_lectores_distribuido == 0){
         wait(semaforo_atomico);
-        *dentro = 1;
+        *dentro = 0;
         post(semaforo_atomico);
         wait(semaforo_atomico);
         *quiero = 0;

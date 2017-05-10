@@ -65,7 +65,6 @@ int main(int argc, char *argv[]){
         scanf(" %i", &numero);
         fflush(stdin);
         if(numero == 0) exit(0);
-        cuenta_atras(10);
         printf("%s\n", hora_actual());
         int i=0;
         pthread_t hilo;
@@ -162,7 +161,7 @@ void sistema_distribuido(){
 
     //SC
     seccion_critica_distribuda("Prerreserva ha entrado en la SC distribuida", nodo, pid_sc_distribuida, PRERRESERVA, 1);
-    sleep(1);
+    sleep(2);
     seccion_critica_distribuda("Prerreserva ha salido de la SC distribuida", nodo, pid_sc_distribuida, PRERRESERVA, 0);
     //distribuida
 

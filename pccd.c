@@ -75,7 +75,7 @@ void *asignar_memoria_compartida(int zona_memoria){
 
 void seccion_critica_local(char *mensaje, int nodo, pid_t pid_sc, int tipo, int entrar){
     FILE *fichero = fopen("/home/juan/PCCD_C/seccion_critica_local.txt", "a");
-    if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fclose(fichero) != 0){
+    if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fflush(fichero) != 0 || fclose(fichero) != 0){
         perror("Error al escribir en la seccion critica distribuida");
         exit(-1);
     }
@@ -101,12 +101,11 @@ void seccion_critica_local(char *mensaje, int nodo, pid_t pid_sc, int tipo, int 
         default:
             exit(0);
     }
-    sleep(1);
 }
 
 void seccion_critica_distribuda(char *mensaje, int nodo, pid_t pid_sc, int tipo, int entrar){
     FILE *fichero = fopen("/home/juan/PCCD_C/seccion_critica_distribuida.txt", "a");
-    if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fclose(fichero) != 0){
+    if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fflush(fichero) != 0|| fclose(fichero) != 0){
         perror("Error al escribir en la seccion critica distribuida");
         exit(-1);
     }
@@ -132,7 +131,6 @@ void seccion_critica_distribuda(char *mensaje, int nodo, pid_t pid_sc, int tipo,
         default:
             exit(0);
     }
-    sleep(1);
 }
 
 char *hora_actual(){
@@ -205,16 +203,4 @@ int obtener_buzon(key_t clave, int modo){
         }
     }
     return buzon;
-}
-
-void cuenta_atras(int segundos){
-    int i;
-    for(i=0; i<segundos; i++){
-        printf("%i", i);
-        fflush(stdout);
-        sleep(1);
-        printf(", ");
-        fflush(stdout);
-    }
-    printf("YAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
 }
