@@ -37,3 +37,4 @@ void recibir_mensaje(long tipo, int receptor, int* emisor, int* ticket_origen, i
 int obtener_buzon(key_t clave, int modo);
 void seccion_critica_distribuda(char *mensaje, int nodo, pid_t pid_sc, int tipo, int entrar);
 void seccion_critica_local(char *mensaje, int nodo, pid_t pid_sc, int tipo, int entrar);
+void cuenta_atras(int segundos);

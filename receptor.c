@@ -14,13 +14,13 @@ int main(int argc, char* argv[]) {
     key_t clave_mi_ticket, clave_max_ticket, clave_id_nodos_pendientes, clave_num_pendientes, clave_quiero, clave_mi_prioridad, clave_dentro;
     int mem_comp_mi_ticket, mem_comp_max_ticket, mem_comp_id_nodos_pendientes, mem_comp_num_pendientes, mem_comp_quiero, mem_comp_mi_prioridad, mem_comp_dentro;
 
-    clave_mi_ticket = generar_clave("/home/juan/PCCD_C/receptor.c", -1 * nodo);
-    clave_max_ticket = generar_clave("/home/juan/PCCD_C/lectores.c", -1 * nodo);
-    clave_id_nodos_pendientes = generar_clave("/home/juan/PCCD_C/pagos_anulaciones.c", -1 * nodo);
-    clave_num_pendientes = generar_clave("/home/juan/PCCD_C/prerreservas.c", -1 * nodo);
-    clave_quiero = generar_clave("/home/juan/PCCD_C/pccd.c", -1 * nodo);
-    clave_mi_prioridad = generar_clave("/home/juan/PCCD_C/pccd.h", -1 * nodo);
-    clave_dentro = generar_clave("/home/juan/PCCD_C/inicializacion", -1 * nodo);
+    clave_mi_ticket = generar_clave("/home/xavils/CLionProjects/PCCD_C/receptor.c", -1 * nodo);
+    clave_max_ticket = generar_clave("/home/xavils/CLionProjects/PCCD_C/lectores.c", -1 * nodo);
+    clave_id_nodos_pendientes = generar_clave("/home/xavils/CLionProjects/PCCD_C/pagos_anulaciones.c", -1 * nodo);
+    clave_num_pendientes = generar_clave("/home/xavils/CLionProjects/PCCD_C/prerreservas.c", -1 * nodo);
+    clave_quiero = generar_clave("/home/xavils/CLionProjects/PCCD_C/pccd.c", -1 * nodo);
+    clave_mi_prioridad = generar_clave("/home/xavils/CLionProjects/PCCD_C/pccd.h", -1 * nodo);
+    clave_dentro = generar_clave("/home/xavils/CLionProjects/PCCD_C/inicializacion", -1 * nodo);
 
     mem_comp_mi_ticket = obtener_memoria_compartida(clave_mi_ticket, sizeof(int), IPC_CREAT);
     mem_comp_max_ticket = obtener_memoria_compartida(clave_max_ticket, sizeof(int), IPC_CREAT);
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
     *mi_ticket = 0;
     *dentro = 0;
 
-    key_t clave_buzon = generar_clave("/home/juan/PCCD_C/pccd.c", nodo);
+    key_t clave_buzon = generar_clave("/home/xavils/CLionProjects/PCCD_C/pccd.c", nodo);
     int buzon = obtener_buzon(clave_buzon, IPC_CREAT);
     printf("El buzon es %i y se genero con %i\n", buzon, clave_buzon);
 
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]) {
 
     /***************************************************************************************/
 
-    key_t clave_atomico = generar_clave("/home/juan/PCCD_C/inicializacion.c", -1*nodo);
+    key_t clave_atomico = generar_clave("/home/xavils/CLionProjects/PCCD_C/inicializacion.c", -1*nodo);
     int mem_comp_atomico = obtener_memoria_compartida(clave_atomico, sizeof(sem_t), IPC_CREAT);
     sem_t *semaforo_atomico = asignar_memoria_compartida(mem_comp_atomico);
     inicializar_semaforo(semaforo_atomico, 1);

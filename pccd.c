@@ -42,7 +42,7 @@ int obtener_memoria_compartida(key_t clave, size_t talla, int modo){
 
     if(modo == IPC_CREAT){
         memoria_compartida = shmget(clave, talla, 0777 | IPC_CREAT);
-        FILE *fichero = fopen("/home/juan/PCCD_C/memoria_compartida.txt", "a");
+        FILE *fichero = fopen("/home/xavils/CLionProjects/PCCD_C/memoria_compartida.txt", "a");
         if(fprintf(fichero, "%i\n", memoria_compartida) < 0 || fclose(fichero) != 0){
             perror("Error al escribir en el fichero 'memoria_compartida.txt'");
             exit(-1);
@@ -74,8 +74,8 @@ void *asignar_memoria_compartida(int zona_memoria){
 }
 
 void seccion_critica_local(char *mensaje, int nodo, pid_t pid_sc, int tipo, int entrar){
-    FILE *fichero = fopen("/home/juan/PCCD_C/seccion_critica_local.txt", "a");
-    if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fflush(fichero) != 0 || fclose(fichero) != 0){
+    FILE *fichero = fopen("/home/xavils/CLionProjects/PCCD_C/seccion_critica_local.txt", "a");
+    if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fclose(fichero) != 0){
         perror("Error al escribir en la seccion critica distribuida");
         exit(-1);
     }
@@ -101,11 +101,12 @@ void seccion_critica_local(char *mensaje, int nodo, pid_t pid_sc, int tipo, int 
         default:
             exit(0);
     }
+    sleep(1);
 }
 
 void seccion_critica_distribuda(char *mensaje, int nodo, pid_t pid_sc, int tipo, int entrar){
-    FILE *fichero = fopen("/home/juan/PCCD_C/seccion_critica_distribuida.txt", "a");
-    if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fflush(fichero) != 0|| fclose(fichero) != 0){
+    FILE *fichero = fopen("/home/xavils/CLionProjects/PCCD_C/seccion_critica_distribuida.txt", "a");
+    if(fprintf(fichero, "%s---%i. %s\n", hora_actual(), nodo, mensaje) < 0 || fclose(fichero) != 0){
         perror("Error al escribir en la seccion critica distribuida");
         exit(-1);
     }
@@ -131,6 +132,7 @@ void seccion_critica_distribuda(char *mensaje, int nodo, pid_t pid_sc, int tipo,
         default:
             exit(0);
     }
+   // sleep(1);
 }
 
 char *hora_actual(){
@@ -148,7 +150,7 @@ char *hora_actual(){
 
 void enviar_mensaje(long tipo, int destino, int emisor, int ticket, int prioridad){
 
-    key_t clave = generar_clave("/home/juan/PCCD_C/pccd.c", destino);
+    key_t clave = generar_clave("/home/xavils/CLionProjects/PCCD_C/pccd.c", destino);
     int buzon = obtener_buzon(clave, IPC_CREAT);
 
     struct mensaje_struct mensaje;
@@ -167,7 +169,7 @@ void enviar_mensaje(long tipo, int destino, int emisor, int ticket, int priorida
 
 void recibir_mensaje(long tipo, int receptor, int* emisor, int* ticket_origen, int* prioridad_vecino){
 
-    key_t clave = generar_clave("/home/juan/PCCD_C/pccd.c", receptor);
+    key_t clave = generar_clave("/home/xavils/CLionProjects/PCCD_C/pccd.c", receptor);
     int buzon = obtener_buzon(clave, IPC_EXCL);
     struct mensaje_struct mensaje;
 
@@ -203,4 +205,16 @@ int obtener_buzon(key_t clave, int modo){
         }
     }
     return buzon;
+}
+
+void cuenta_atras(int segundos){
+    int i;
+    for(i=0; i<segundos; i++){
+        printf("%i", i);
+        fflush(stdout);
+        sleep(1);
+        printf(", ");
+        fflush(stdout);
+    }
+    printf("YAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
 }

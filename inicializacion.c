@@ -17,12 +17,12 @@ int main(int argc, char *argv[]){
     sem_t *semaforo_pagos_anulaciones, *semaforo_prerreservas, *semaforo_prioridades, *semaforo_lectores, *semaforo_escritores;
     int *numero_escritores;
 
-    clave_pagos_anulaciones = generar_clave("/home/juan/PCCD_C/pagos_anulaciones.c", nodo);
-    clave_prerreservas = generar_clave("/home/juan/PCCD_C/prerreservas.c", nodo);
-    clave_prioridades = generar_clave("/home/juan/PCCD_C/inicializacion.c", nodo);
-    clave_lectores = generar_clave("/home/juan/PCCD_C/lectores.c", nodo);
-    clave_escritores_contador = generar_clave("/home/juan/PCCD_C/pccd.c", nodo);
-    clave_escritores_semaforo = generar_clave("/home/juan/PCCD_C/receptor.c", nodo);
+    clave_pagos_anulaciones = generar_clave("/home/xavils/CLionProjects/PCCD_C/pagos_anulaciones.c", nodo);
+    clave_prerreservas = generar_clave("/home/xavils/CLionProjects/PCCD_C/prerreservas.c", nodo);
+    clave_prioridades = generar_clave("/home/xavils/CLionProjects/PCCD_C/inicializacion.c", nodo);
+    clave_lectores = generar_clave("/home/xavils/CLionProjects/PCCD_C/lectores.c", nodo);
+    clave_escritores_contador = generar_clave("/home/xavils/CLionProjects/PCCD_C/pccd.c", nodo);
+    clave_escritores_semaforo = generar_clave("/home/xavils/CLionProjects/PCCD_C/receptor.c", nodo);
 
     mem_comp_pagos_anulaciones = obtener_memoria_compartida(clave_pagos_anulaciones, sizeof(sem_t), IPC_CREAT);
     mem_comp_prerreservas = obtener_memoria_compartida(clave_prerreservas, sizeof(sem_t), IPC_CREAT);
